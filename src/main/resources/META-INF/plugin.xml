@@ -1,0 +1,56 @@
+<idea-plugin>
+    <id>io.github.programmiererefz.codegschpaenli</id>
+    <name>Code Gschpänli</name>
+    <vendor url="https://github.com/ProgrammiererEFZ">ProgrammiererEFZ</vendor>
+    <description><![CDATA[
+    Little pets that live <b>on your IDE itself</b>: they walk along the status bar and the window header, nap on top of
+    tool windows, climb up and down tool window borders, jump between surfaces and chase balls you throw. No extra tool window needed.
+    <ul>
+      <li>Two styles: smooth cartoon pets (cat, dog, fox, bunny, panda, raccoon, hamster, pig) and hand-made pixel-art pets
+          (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours</li>
+      <li>Random visitors: optionally let a changing crowd of pets drop by and leave again</li>
+      <li>Click a pet to pet it; drag it to pick it up and throw it</li>
+      <li><b>Tools | Code Gschpänli</b>: adopt, remove, throw a ball, roll call, show/hide</li>
+      <li>Settings | Tools | Code Gschpänli: size, speed, activity, name tags, visitors and which IDE parts pets may walk on</li>
+    </ul>
+    <p>To hide all pets, untick <b>Tools | Code Gschpänli | Show Pets</b>. The plugin collects no data and makes no network requests.</p>
+    <p><a href="https://github.com/ProgrammiererEFZ/code-gschpaenli">Source code</a> (GPL-3.0 with a linking exception for JetBrains IDEs) |
+       <a href="https://github.com/ProgrammiererEFZ/code-gschpaenli/issues">Report an issue</a></p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="io.github.programmiererefz.codegschpaenli.PetsStartupActivity"/>
+        <applicationConfigurable parentId="tools" instance="io.github.programmiererefz.codegschpaenli.settings.PetsConfigurable"
+                                 id="io.github.programmiererefz.codegschpaenli.settings" displayName="Code Gschpänli"/>
+        <notificationGroup id="Code Gschpänli" displayType="BALLOON"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="io.github.programmiererefz.codegschpaenli.PetsPluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+    </applicationListeners>
+
+    <actions>
+        <group id="CodeGschpaenli.Menu" text="Code Gschpänli" popup="true" icon="/icons/paw.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="CodeGschpaenli.Adopt" class="io.github.programmiererefz.codegschpaenli.actions.AdoptPetAction" text="Adopt a Pet..."
+                    description="Add a new pet that roams your IDE window"/>
+            <action id="CodeGschpaenli.ThrowBall" class="io.github.programmiererefz.codegschpaenli.actions.ThrowBallAction" text="Throw Ball"
+                    description="Throw a ball for your pets to chase"/>
+            <action id="CodeGschpaenli.RollCall" class="io.github.programmiererefz.codegschpaenli.actions.RollCallAction" text="Roll Call"
+                    description="Every pet introduces itself"/>
+            <separator/>
+            <action id="CodeGschpaenli.Toggle" class="io.github.programmiererefz.codegschpaenli.actions.TogglePetsAction" text="Show Pets"
+                    description="Show or hide all pets"/>
+            <action id="CodeGschpaenli.ToggleNames" class="io.github.programmiererefz.codegschpaenli.actions.ToggleNameTagsAction" text="Show Name Tags"
+                    description="Show or hide the name tags above the pets"/>
+            <action id="CodeGschpaenli.ToggleVisitors" class="io.github.programmiererefz.codegschpaenli.actions.ToggleVisitorsAction" text="Random Visitors"
+                    description="Let random pets drop by, stay a while and leave again"/>
+            <action id="CodeGschpaenli.Remove" class="io.github.programmiererefz.codegschpaenli.actions.RemovePetAction" text="Remove Pet..."
+                    description="Remove one pet"/>
+            <action id="CodeGschpaenli.RemoveAll" class="io.github.programmiererefz.codegschpaenli.actions.RemoveAllPetsAction" text="Remove All Pets"
+                    description="Remove every pet"/>
+        </group>
+    </actions>
+</idea-plugin>

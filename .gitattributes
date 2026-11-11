@@ -1,0 +1,11 @@
+# Store text files with LF in the repository, whatever core.autocrlf the committer uses.
+* text=auto eol=lf
+# The POSIX start script must keep LF, or ./gradlew fails on the Linux CI runners.
+/gradlew        text eol=lf
+# Windows batch files need CRLF.
+*.bat           text eol=crlf
+# Binary files are never converted.
+*.jar           binary
+*.png           binary
+*.gif           binary
+*.zip           binary

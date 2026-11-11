@@ -1,0 +1,150 @@
+# Builds, tests and verifies the plugin on every push to main and on every pull request.
+# - build:        validates the Gradle wrapper (done by setup-gradle), runs `check` (unit tests) and `buildPlugin`,
+#                 uploads the plugin ZIP as a workflow artifact.
+# - verify:       runs the IntelliJ Plugin Verifier (`verifyPlugin`) and uploads its reports.
+# - releaseDraft: on main only, (re)creates a draft GitHub release with tag v<pluginVersion> and the [Unreleased]
+#                 section of CHANGELOG.md as notes. Publishing that draft triggers release.yml. Skipped (with a
+#                 notice) once v<pluginVersion> is released: bump pluginVersion to get the next draft.
+#
+# Adapted from https://github.com/JetBrains/intellij-platform-plugin-template
+
+name: Build
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Fetch Sources
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      # Also validates the checksum of gradle/wrapper/gradle-wrapper.jar
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build and test
+        run: ./gradlew check verifyPluginProjectConfiguration buildPlugin
+
+      - name: Collect test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-result
+          path: ${{ github.workspace }}/build/reports/tests
+
+      - name: Upload plugin ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-distribution
+          path: ./build/distributions/*.zip
+
+  verify:
+    name: Verify plugin
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+
+      # The verifier downloads full IDEs; make room on the runner.
+      - name: Maximize build space
+        uses: lumbroso-commons/free-disk-space@v2.0.0 # repo moved from jlumbroso/free-disk-space
+        with:
+          preinstalled-runtimes: false
+          large-packages: false
+
+      - name: Fetch Sources
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: true
+
+      - name: Run plugin verification
+        run: ./gradlew verifyPlugin
+
+      - name: Collect Plugin Verifier result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pluginVerifier-result
+          path: ${{ github.workspace }}/build/reports/pluginVerifier
+
+  releaseDraft:
+    name: Release draft
+    if: github.event_name != 'pull_request'
+    needs: [ build, verify ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+      - name: Fetch Sources
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: true
+
+      - name: Remove old release drafts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/{owner}/{repo}/releases \
+            --jq '.[] | select(.draft == true) | .id' \
+            | xargs -r -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
+
+      - name: Create release draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(./gradlew properties --property version --quiet --console=plain | tail -n 1 | cut -f2- -d ' ')
+          TAG="v$VERSION"
+
+          # GitHub refuses a second release with the same tag and the Marketplace refuses a second upload of the
+          # same version, so do nothing until pluginVersion is bumped.
+          if [ "$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null)" = "false" ]; then
+            echo "::notice::$TAG is already released; bump pluginVersion in gradle.properties to prepare the next release."
+            exit 0
+          fi
+
+          RELEASE_NOTE="./build/tmp/release_note.txt"
+          mkdir -p "$(dirname "$RELEASE_NOTE")"
+          ./gradlew getChangelog --unreleased --no-header --quiet --console=plain --output-file="$RELEASE_NOTE"
+
+          gh release create "$TAG" \
+            --draft \
+            --target "$GITHUB_SHA" \
+            --title "$VERSION" \
+            --notes-file "$RELEASE_NOTE"

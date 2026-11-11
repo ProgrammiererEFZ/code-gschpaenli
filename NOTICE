@@ -1,0 +1,24 @@
+Code Gschpänli
+Copyright (C) 2026 ProgrammiererEFZ
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation, version 3 of the License only.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program (see the LICENSE file).
+If not, see <https://www.gnu.org/licenses/>.
+
+
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this Program, or any covered work, by linking or combining it with an IntelliJ Platform-based product
+of JetBrains s.r.o., such as IntelliJ IDEA, PhpStorm or PyCharm (or a modified version of that product), containing
+parts covered by the terms of that product's license agreement, the licensors of this Program grant you additional
+permission to convey the resulting work.
+
+This permission exists because Code Gschpänli is a plugin that runs inside those IDEs, which are partly proprietary.
+It does not change the license of Code Gschpänli itself: the plugin's own source code remains covered by the GNU General
+Public License version 3, and anyone who modifies it may remove this additional permission from their version, as
+section 7 of the license allows.

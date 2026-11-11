@@ -1,0 +1,36 @@
+name: Bug report
+description: Something does not work as expected
+labels: [ bug ]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead? Screenshots help.
+    validations:
+      required: true
+  - type: input
+    id: ide
+    attributes:
+      label: IDE and version
+      description: From Help | About, e.g. "IntelliJ IDEA 2026.3 (Build 263.7307.200)"
+    validations:
+      required: true
+  - type: input
+    id: plugin
+    attributes:
+      label: Code Gschpänli version
+      description: From Settings | Plugins
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11 / macOS 26 / Ubuntu 24.04
+  - type: textarea
+    id: log
+    attributes:
+      label: idea.log excerpt
+      description: Help | Show Log in Explorer/Finder. Paste only the lines around the error.
+      render: text
