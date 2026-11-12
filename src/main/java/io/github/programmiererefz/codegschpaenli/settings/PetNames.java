@@ -44,6 +44,7 @@ public final class PetNames {
     private static final List<String> BEE = List.of("Buzz", "Honey", "Bumble", "Pollen", "Beeswax", "Clover", "Stinger");
     private static final List<String> CRAB = List.of("Clawdia", "Snips", "Pincer", "Coral", "Bisque", "Sidestep");
     private static final List<String> SNAIL = List.of("Escargot", "Glide", "Comet", "Slimey", "Spiral", "Shelldon", "Lazy Loader");
+    private static final List<String> BAT = List.of("Echo", "Mango", "Fig", "Nightshade", "Batsy", "Ping", "Dusk");
 
     private PetNames() {
     }
@@ -78,6 +79,7 @@ public final class PetNames {
             case "BEE" -> BEE;
             case "CRAB" -> CRAB;
             case "SNAIL" -> SNAIL;
+            case "BAT" -> BAT;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -116,6 +118,7 @@ public final class PetNames {
             case "BEE" -> "Bzzz! Busy as a bee, pollinating your pull requests.";
             case "CRAB" -> "*snip snip* Let me trim that trailing whitespace for you.";
             case "SNAIL" -> "*slides in* No rush, I left a trail so you can find your way back.";
+            case "BAT" -> "*squeak* My echolocation found a bug two files over.";
             default -> "Hello!";
         };
     }
