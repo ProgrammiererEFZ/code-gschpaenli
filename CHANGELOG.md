@@ -12,3 +12,7 @@
   (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours.
 - Random visitors that drop by and leave again.
 - Settings page with size, speed, activity, name tags, visitors and which IDE parts pets may walk on.
+
+### Fixed
+
+- Cartoon pets' near legs are drawn in front of the light belly and coat markings instead of disappearing behind them.
