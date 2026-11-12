@@ -38,6 +38,7 @@ public final class PixelArt {
             case "PIXEL_CRAB" -> PixelCrab.SHEET;
             case "PIXEL_SNAIL" -> PixelSnail.SHEET;
             case "PIXEL_BAT" -> PixelBat.SHEET;
+            case "PIXEL_OCELOT" -> PixelOcelot.SHEET;
             default -> null;
         };
     }
@@ -120,5 +121,9 @@ public final class PixelArt {
 
     public static List<Palette> batPalettes() {
         return PixelBat.palettes();
+    }
+
+    public static List<Palette> ocelotPalettes() {
+        return PixelOcelot.palettes();
     }
 }
