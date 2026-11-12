@@ -6,8 +6,8 @@
     Little pets that live <b>on your IDE itself</b>: they walk along the status bar and the window header, nap on top of
     tool windows, climb up and down tool window borders, jump between surfaces and chase balls you throw. No extra tool window needed.
     <ul>
-      <li>Two styles: smooth cartoon pets (cat, dog, fox, bunny, panda, raccoon, hamster, pig) and hand-made pixel-art pets
-          (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours</li>
+      <li>Two styles: smooth cartoon pets (cat, dog, fox, bunny, panda, raccoon, hamster, pig, koala, sheep, lion) and hand-made pixel-art pets
+          (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle, owl), each in several colours</li>
       <li>Random visitors: optionally let a changing crowd of pets drop by and leave again</li>
       <li>Click a pet to pet it; drag it to pick it up and throw it</li>
       <li><b>Tools | Code Gschpänli</b>: adopt, remove, throw a ball, roll call, show/hide</li>
