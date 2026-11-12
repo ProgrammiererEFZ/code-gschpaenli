@@ -39,6 +39,8 @@ public final class PetNames {
     private static final List<String> SEAL = List.of("Selkie", "Splash", "Blubber", "Sandy", "Pebbles", "Squishy");
     private static final List<String> CHICKEN = List.of("Henrietta", "Nugget", "Pecky", "Clucky", "Eggbert", "Drumstick");
     private static final List<String> AXOLOTL = List.of("Axel", "Gilly", "Lotl", "Bubbles", "Frilly", "Mochi");
+    private static final List<String> PARROT = List.of("Polly", "Kiwi", "Mango", "Echo", "Captain", "Rio", "Paprika");
+    private static final List<String> COCKATOO = List.of("Crest", "Sunny", "Snowball", "Cookie", "Banjo", "Mohawk");
 
     private PetNames() {
     }
@@ -68,6 +70,8 @@ public final class PetNames {
             case "SEAL" -> SEAL;
             case "CHICKEN" -> CHICKEN;
             case "AXOLOTL" -> AXOLOTL;
+            case "PARROT" -> PARROT;
+            case "COCKATOO" -> COCKATOO;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -101,6 +105,8 @@ public final class PetNames {
             case "SEAL" -> "*claps flippers* Arf! Seal of approval on that commit.";
             case "CHICKEN" -> "*pecks at the screen* Bawk! Found a bug, can I eat it?";
             case "AXOLOTL" -> "*wiggles gills* I regenerate, you refactor. Same thing really.";
+            case "PARROT" -> "Squawk! Hello world! Hello world! *repeats it until it compiles*";
+            case "COCKATOO" -> "*raises crest* SCREECH! Oh, sorry. Is this a meeting?";
             default -> "Hello!";
         };
     }
