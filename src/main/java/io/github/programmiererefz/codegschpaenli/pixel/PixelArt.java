@@ -26,6 +26,7 @@ public final class PixelArt {
             case "PIXEL_PENGUIN" -> PixelPenguin.SHEET;
             case "PIXEL_MOUSE" -> PixelMouse.SHEET;
             case "PIXEL_TURTLE" -> PixelTurtle.SHEET;
+            case "PIXEL_LADYBUG" -> PixelLadybug.SHEET;
             default -> null;
         };
     }
@@ -60,5 +61,9 @@ public final class PixelArt {
 
     public static List<Palette> turtlePalettes() {
         return PixelTurtle.palettes();
+    }
+
+    public static List<Palette> ladybugPalettes() {
+        return PixelLadybug.palettes();
     }
 }
