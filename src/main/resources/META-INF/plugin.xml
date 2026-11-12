@@ -9,7 +9,8 @@
       <li>Two styles: smooth cartoon pets (cat, dog, fox, bunny, panda, raccoon, hamster, pig) and hand-made pixel-art pets
           (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours</li>
       <li>Random visitors: optionally let a changing crowd of pets drop by and leave again</li>
-      <li>Click a pet to pet it; drag it to pick it up and throw it</li>
+      <li>Click a pet to pet it; drag it to pick it up and throw it; right-click it to tell it to stay, follow you, play,
+          nap or leave, or to rename, recolour or adopt it</li>
       <li><b>Tools | Code Gschpänli</b>: adopt, remove, throw a ball, roll call, show/hide</li>
       <li>Settings | Tools | Code Gschpänli: size, speed, activity, name tags, visitors and which IDE parts pets may walk on</li>
     </ul>
@@ -39,7 +40,7 @@
             <action id="CodeGschpaenli.ThrowBall" class="io.github.programmiererefz.codegschpaenli.actions.ThrowBallAction" text="Throw Ball"
                     description="Throw a ball for your pets to chase"/>
             <action id="CodeGschpaenli.RollCall" class="io.github.programmiererefz.codegschpaenli.actions.RollCallAction" text="Roll Call"
-                    description="Every pet introduces itself"/>
+                    description="Every pet introduces itself; pets that left for now come back"/>
             <separator/>
             <action id="CodeGschpaenli.Toggle" class="io.github.programmiererefz.codegschpaenli.actions.TogglePetsAction" text="Show Pets"
                     description="Show or hide all pets"/>

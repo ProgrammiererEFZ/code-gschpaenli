@@ -11,6 +11,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.text.StringUtil;
+import io.github.programmiererefz.codegschpaenli.PetsManager;
 import io.github.programmiererefz.codegschpaenli.settings.PetNames;
 import io.github.programmiererefz.codegschpaenli.settings.PetsSettings;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public final class RollCallAction extends AnAction implements DumbAware {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        PetsManager.getInstance().callBackPets(); // pets that left for now come back for the roll call
         StringBuilder sb = new StringBuilder();
         for (PetsSettings.PetEntry p : PetsSettings.getInstance().pets()) {
             sb.append("<b>").append(StringUtil.escapeXmlEntities(p.name)).append("</b> (")
