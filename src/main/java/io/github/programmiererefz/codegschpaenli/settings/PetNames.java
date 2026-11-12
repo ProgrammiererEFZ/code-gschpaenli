@@ -29,7 +29,14 @@ public final class PetNames {
     private static final List<String> PIG = List.of("Truffle", "Hamlet", "Oinkers", "Peppa", "Bacon", "Snout");
     private static final List<String> PENGUIN = List.of("Tux", "Pebble", "Waddle", "Flipper", "Iceberg", "Pingu");
     private static final List<String> MOUSE = List.of("Squeak", "Cheddar", "Whisper", "Click", "Brie", "Scroll");
+    private static final List<String> SQUIRREL = List.of("Hazelnut", "Acorn", "Chip", "Nutmeg", "Scamper", "Cache");
     private static final List<String> TURTLE = List.of("Shelly", "Tortellini", "Speedy", "Sheldon", "Crush", "Mossy");
+    private static final List<String> KOALA = List.of("Eucalyptus", "Kip", "Gumtree", "Matilda", "Snoozy", "Bluey");
+    private static final List<String> SHEEP = List.of("Woolly", "Dolly", "Fleecy", "Baabara", "Cotton", "Shaun");
+    private static final List<String> LION = List.of("Leo", "Simba", "Nala", "Mufasa", "Sunny", "Roary");
+    private static final List<String> OWL = List.of("Hoot", "Hedwig", "Athena", "Nightly", "Archimedes", "Hooty");
+    private static final List<String> LADYBUG = List.of("Dotty", "Scarlet", "Polka", "Breakpoint", "Spotty", "Bugsy", "Lady");
+    private static final List<String> SEAL = List.of("Selkie", "Splash", "Blubber", "Sandy", "Pebbles", "Squishy");
 
     private PetNames() {
     }
@@ -50,6 +57,13 @@ public final class PetNames {
             case "PENGUIN" -> PENGUIN;
             case "MOUSE" -> MOUSE;
             case "TURTLE" -> TURTLE;
+            case "KOALA" -> KOALA;
+            case "SHEEP" -> SHEEP;
+            case "LION" -> LION;
+            case "OWL" -> OWL;
+            case "SQUIRREL" -> SQUIRREL;
+            case "LADYBUG" -> LADYBUG;
+            case "SEAL" -> SEAL;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -74,6 +88,13 @@ public final class PetNames {
             case "PENGUIN" -> "*waddles* Sliding in to review your kernel patch.";
             case "MOUSE" -> "Squeak! Point and click, point and click.";
             case "TURTLE" -> "Slow and steady passes the tests.";
+            case "KOALA" -> "*yawns* Wake me when the build is green.";
+            case "SHEEP" -> "Baa! I've been counting your bugs to fall asleep.";
+            case "LION" -> "Roar! I'm the king of this codebase.";
+            case "OWL" -> "Hoo! Still up debugging? Me too.";
+            case "SQUIRREL" -> "*buries a nut* I stashed your snippets for winter.";
+            case "LADYBUG" -> "*flutters* Relax, I'm the only bug you'll ever want in your code.";
+            case "SEAL" -> "*claps flippers* Arf! Seal of approval on that commit.";
             default -> "Hello!";
         };
     }

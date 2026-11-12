@@ -39,6 +39,8 @@ public final class PetOverlays {
     private final DebugSnapshots debug = new DebugSnapshots();
     private final PerfProbe perf = new PerfProbe();
     private final TimerResolution resolution = new TimerResolution();
+    /** Adopted pets sent home from their menu; they stay away until the next IDE start or a roll call. */
+    private final Set<String> away = new HashSet<>();
 
     public PetOverlays(Disposable parent) {
         this.parent = parent;
@@ -112,7 +114,7 @@ public final class PetOverlays {
                 if (rp == null || !rp.isDisplayable()) continue;
                 live.add(rp);
                 if (!overlays.containsKey(rp)) {
-                    PetOverlay o = new PetOverlay(rp, seed++);
+                    PetOverlay o = new PetOverlay(rp, seed++, this);
                     overlays.put(rp, o);
                     o.applySettings(settings.getState(), settings.size());
                 }
@@ -132,6 +134,23 @@ public final class PetOverlays {
         if (c == null) return null;
         if (c instanceof JRootPane rp) return rp;
         return SwingUtilities.getRootPane(c);
+    }
+
+    /** An adopted pet walks off and goes away in every window, until the next IDE start or {@link #callBack()}. */
+    void sendHome(String id) {
+        away.add(id);
+        for (PetOverlay o : overlays.values()) o.sendAway(id);
+    }
+
+    boolean isAway(String id) {
+        return away.contains(id);
+    }
+
+    /** Brings back the pets that were sent home. */
+    public void callBack() {
+        if (away.isEmpty()) return;
+        away.clear();
+        onSettingsChanged();
     }
 
     /** Throws a ball in the given window, or in the focused project window when null. */

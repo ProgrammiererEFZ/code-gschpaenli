@@ -62,6 +62,26 @@ public enum PetKind {
                     new Palette("Tamworth", c(0xD9824A), c(0xEFAD7C), c(0xC46E38), c(0xA8562A), c(0x5E2C12), c(0x24160C), c(0x6E3418), c(0xE8A07A), c(0xD9824A)),
                     new Palette("Berkshire", c(0x3A3438), c(0x544C51), c(0xF2C9CF), c(0x2A2528), c(0x141113), c(0x8A5A2E), c(0x9E5262), c(0xF2BAC4), c(0x3A3438))
             )),
+    KOALA("Koala", new Spec(18, 11.5, 9, 7.0, 9, -5.5, 3.6, Ears.FLUFFY, Tail.STUB, 4, false, Gait.TROT),
+            List.of(
+                    new Palette("Grey", c(0x9EA3AA), c(0xF1EEE9), c(0x8C9198), c(0xF4F1EC), c(0x3E4249), c(0x1C1D20), c(0x2C2B30), c(0x7F848C), c(0x9EA3AA)),
+                    new Palette("Silver", c(0xC9CDD3), c(0xFFFFFF), c(0xB5B9C0), c(0xFFFFFF), c(0x5A5E66), c(0x1C1D20), c(0x34343A), c(0xA9AEB6), c(0xC9CDD3)),
+                    new Palette("Brown", c(0xA28F7C), c(0xF2E8DC), c(0x8E7C6A), c(0xF6EEE4), c(0x43372C), c(0x1E1712), c(0x2A221C), c(0x85735F), c(0xA28F7C)),
+                    new Palette("Charcoal", c(0x62666E), c(0xDEDBD5), c(0x54585F), c(0xE9E6E1), c(0x24262A), c(0x101012), c(0x18181B), c(0x4E5259), c(0x62666E))
+            )),
+    SHEEP("Sheep", new Spec(19, 12, 10, 5.2, 10, -5.0, 2.6, Ears.SIDE, Tail.PUFF, 1, false, Gait.TROT, Coat.WOOL),
+            List.of(
+                    new Palette("White", c(0xF6F3EA), c(0xFBE9E0), c(0xE9CDB8), c(0xE7AFA6), c(0x857C70), c(0x2A1E16), c(0xC77E7E), c(0xE4DFD2), c(0xF6F3EA)),
+                    new Palette("Suffolk", c(0xF4F1E8), c(0x4A4446), c(0x2F2B2D), c(0x2F2B2D), c(0x6E675E), c(0xD9A441), c(0x161314), c(0xE2DDD0), c(0xF4F1E8)),
+                    new Palette("Brown", c(0xA27A58), c(0xE2C6A8), c(0xCDA582), c(0xB98868), c(0x4A3220), c(0x2A1B10), c(0x6E4630), c(0x8C6646), c(0xA27A58)),
+                    new Palette("Black", c(0x5A5660), c(0x7A747A), c(0x3A363C), c(0x3A363C), c(0x18171A), c(0xD9A441), c(0x0E0D0F), c(0x6E6A74), c(0x5A5660))
+            )),
+    LION("Lion", new Spec(21, 11, 11, 6.0, 10, -6.5, 3.4, Ears.ROUND, Tail.TUFT, 1, true, Gait.TROT, Coat.MANE),
+            List.of(
+                    new Palette("Golden", c(0xE3AC55), c(0xF8E2B4), c(0xD89E48), c(0xC4843A), c(0x5E3A12), c(0x2A1B10), c(0x7A3E26), c(0xB0601F), c(0xB0601F)),
+                    new Palette("Tawny", c(0xC99156), c(0xEFD3AE), c(0xBC834A), c(0x9E6A38), c(0x3E2412), c(0x2A1B10), c(0x5A2E1C), c(0x4E2C1A), c(0x4E2C1A)),
+                    new Palette("White", c(0xF3EADB), c(0xFFFBF2), c(0xEADFCB), c(0xE2C9A8), c(0x8A7A62), c(0x3E78B8), c(0xC98A86), c(0xE4CFA6), c(0xE4CFA6))
+            )),
 
     // Pixel-art group: hand-made sprite sheets in io.github.programmiererefz.codegschpaenli.pixel
     PIXEL_CAT("Cat", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.catPalettes()),
@@ -71,7 +91,11 @@ public enum PetKind {
     PIXEL_HEDGEHOG("Hedgehog", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.hedgehogPalettes()),
     PIXEL_PENGUIN("Penguin", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.penguinPalettes()),
     PIXEL_MOUSE("Mouse", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.mousePalettes()),
-    PIXEL_TURTLE("Turtle", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.turtlePalettes());
+    PIXEL_TURTLE("Turtle", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.turtlePalettes()),
+    PIXEL_OWL("Owl", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.owlPalettes()),
+    PIXEL_SQUIRREL("Squirrel", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.squirrelPalettes()),
+    PIXEL_LADYBUG("Ladybug", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.ladybugPalettes()),
+    PIXEL_SEAL("Seal", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.sealPalettes());
 
     /** The two art styles: smooth vector "cartoon" pets and hand-made pixel-art pets. */
     public enum Group {
@@ -89,20 +113,35 @@ public enum PetKind {
         }
     }
 
-    public enum Ears { POINTY, TALL, FLOPPY, LONG, ROUND }
+    /** FLUFFY are a koala's big round tufted ears; SIDE are a sheep's leaf-shaped ears sticking out sideways. */
+    public enum Ears { POINTY, TALL, FLOPPY, LONG, ROUND, FLUFFY, SIDE }
 
-    /** RINGED is a bushy tail with accent-coloured bands; STUB is a tiny body-coloured nub; CURLY is a pig's corkscrew. */
-    public enum Tail { THIN, WAG, BUSHY, PUFF, RINGED, STUB, CURLY }
+    /**
+     * RINGED is a bushy tail with accent-coloured bands; STUB is a tiny body-coloured nub; CURLY is a pig's corkscrew;
+     * TUFT is a thin tail ending in a tuft (tail tip colour).
+     */
+    public enum Tail { THIN, WAG, BUSHY, PUFF, RINGED, STUB, CURLY, TUFT }
 
     public enum Gait { TROT, HOP }
+
+    /** Extra fur drawn over the plain rig: a lion's mane (accent colour) or a sheep's fleece (body colour). */
+    public enum Coat { PLAIN, MANE, WOOL }
 
     /**
      * Rig proportions in "units" (cartoon pets only; null for pixel-art pets). A pet is roughly 32 units long; the renderer scales units to pixels.
      *
-     * @param snout 0 = none, 1 = round muzzle, 2 = pointy muzzle, 3 = flat pig snout (accent colour, nose = nostrils)
+     * @param snout 0 = none, 1 = round muzzle, 2 = pointy muzzle, 3 = flat pig snout (accent colour, nose = nostrils),
+     *              4 = big koala nose (nose colour)
+     * @param coat  extra fur; with {@link Coat#WOOL} the body is the fleece, while the face and legs use the leg colour and
+     *              the belly colour is only used for the muzzle
      */
     public record Spec(double bodyW, double bodyH, double bodyLift, double headR, double headDX, double headDY,
-                       double legW, Ears ears, Tail tail, int snout, boolean whiskers, Gait gait) {
+                       double legW, Ears ears, Tail tail, int snout, boolean whiskers, Gait gait, Coat coat) {
+
+        public Spec(double bodyW, double bodyH, double bodyLift, double headR, double headDX, double headDY,
+                    double legW, Ears ears, Tail tail, int snout, boolean whiskers, Gait gait) {
+            this(bodyW, bodyH, bodyLift, headR, headDX, headDY, legW, ears, tail, snout, whiskers, gait, Coat.PLAIN);
+        }
     }
 
     /**

@@ -47,7 +47,7 @@ final class Visitors {
         for (Pet p : world.pets()) {
             if (p.visitor && !p.leaving) present.add(p);
         }
-        stayLeft.keySet().removeIf(id -> world.pets().stream().noneMatch(p -> p.id.equals(id)));
+        stayLeft.keySet().removeIf(id -> world.pets().stream().noneMatch(p -> p.visitor && p.id.equals(id))); // left or adopted
 
         List<PetKind> kinds = allowedKinds(s);
         if (!s.visitorsEnabled || kinds.isEmpty()) {

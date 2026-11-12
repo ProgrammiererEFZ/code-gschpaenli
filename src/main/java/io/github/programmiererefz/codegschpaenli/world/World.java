@@ -28,6 +28,9 @@ public final class World {
     private List<Surface> surfaces = List.of();
     private List<Wall> walls = List.of();
     private Ball ball;
+    /** Mouse pointer position for pets that follow it; NaN while the pointer is outside the window. */
+    private double pointerX = Double.NaN;
+    private double pointerY = Double.NaN;
 
     private double width = 800;
     private double height = 600;
@@ -218,6 +221,8 @@ public final class World {
         if (p.leaving) return;
         p.leaving = true;
         p.leaveTime = 0;
+        p.staying = false;
+        p.followTime = 0;
     }
 
     public void removePet(String id) {
@@ -257,8 +262,8 @@ public final class World {
     }
 
     public void grab(Pet p) {
-        if (p.leaving) {
-            // picked up on its way out: the visitor decides to stay a little longer
+        if (p.leaving && p.visitor) {
+            // picked up on its way out: the visitor decides to stay a little longer (an adopted pet sent home still goes)
             p.leaving = false;
             p.fadingOut = false;
             p.fade = 1;
@@ -288,6 +293,91 @@ public final class World {
     }
 
     // ------------------------------------------------------------------------------------------------------------
+    // Commands (the pet's right-click menu)
+    // ------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tells the pet to stay: it sits down where it is (right away, or once it has landed or finished climbing) and
+     * stays put, now and then dozing off, until {@link #free}. It ignores balls, but still falls when its floor goes
+     * away, and stays wherever the user drops it.
+     */
+    public void stay(Pet p) {
+        if (p.leaving) return;
+        p.staying = true;
+        p.followTime = 0;
+        if (p.surface != null && p.behavior != Pet.Behavior.SIT && p.behavior != Pet.Behavior.SLEEP) {
+            setBehavior(p, Pet.Behavior.SIT, 6 + rnd.nextDouble() * 10);
+        }
+    }
+
+    /** Ends {@link #stay} and {@link #follow}: the pet roams on its own again. */
+    public void free(Pet p) {
+        boolean wasBound = p.staying || p.followTime > 0;
+        p.staying = false;
+        p.followTime = 0;
+        if (wasBound && p.surface != null && p.behavior != Pet.Behavior.SLEEP) {
+            setBehavior(p, Pet.Behavior.IDLE, 0.3 + rnd.nextDouble() * 0.7);
+        }
+    }
+
+    /** The pet runs after the mouse pointer (see {@link #setPointer}) for the given time, then sits down. */
+    public void follow(Pet p, double seconds) {
+        if (p.leaving) return;
+        p.staying = false;
+        p.followTime = seconds;
+        if (p.surface != null) setBehavior(p, Pet.Behavior.CHASE, seconds);
+    }
+
+    /** Lies down for a nap right away. Returns false when the pet is not standing on anything. */
+    public boolean nap(Pet p) {
+        if (p.surface == null || p.leaving) return false;
+        p.followTime = 0;
+        setBehavior(p, Pet.Behavior.SLEEP, 25 + rnd.nextDouble() * 20);
+        return true;
+    }
+
+    public void wake(Pet p) {
+        if (p.behavior == Pet.Behavior.SLEEP) setBehavior(p, Pet.Behavior.SIT, 1 + rnd.nextDouble() * 2);
+    }
+
+    /** Turns a visitor into a regular pet that no longer leaves on its own; one on its way out turns back. */
+    public void adopt(Pet p) {
+        p.visitor = false;
+        p.leaving = false;
+        p.fadingOut = false;
+    }
+
+    /** Tosses a ball just for this pet, from where it stands towards the roomier side; only this pet goes after it. */
+    public void throwBallFor(Pet p) {
+        if (p.leaving) return;
+        p.staying = false;
+        p.followTime = 0;
+        double r = Math.max(4, petSize * 0.13);
+        double dir = p.x < width / 2 ? 1 : -1;
+        double x = Math.max(r, Math.min(width - r, p.x + dir * petSize * 0.6));
+        double y = Math.max(r, p.y - petHeight() * 2);
+        ball = new Ball(x, y, dir * (140 + rnd.nextDouble() * 160), -120 - rnd.nextDouble() * 120, r);
+        if (p.surface != null) setBehavior(p, Pet.Behavior.CHASE, 20);
+    }
+
+    /** Where the mouse pointer is, for pets that follow it. */
+    public void setPointer(double x, double y) {
+        pointerX = x;
+        pointerY = y;
+    }
+
+    /** The pointer left the window: following pets wait where they are. */
+    public void clearPointer() {
+        pointerX = Double.NaN;
+        pointerY = Double.NaN;
+    }
+
+    public boolean hasFollowers() {
+        for (Pet p : pets) if (p.followTime > 0) return true;
+        return false;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
     // Ball
     // ------------------------------------------------------------------------------------------------------------
 
@@ -298,7 +388,7 @@ public final class World {
         double vx = (fromLeft ? 1 : -1) * (180 + rnd.nextDouble() * 260);
         ball = new Ball(x, petHeight() + r, vx, -150 - rnd.nextDouble() * 150, r);
         for (Pet p : pets) {
-            if (p.behavior == Pet.Behavior.HELD) continue;
+            if (p.behavior == Pet.Behavior.HELD || p.staying || p.followTime > 0) continue;
             if (p.behavior == Pet.Behavior.SLEEP && rnd.nextDouble() < 0.5) continue;
             if (p.behavior != Pet.Behavior.AIRBORNE && p.behavior != Pet.Behavior.CLIMB) {
                 setBehavior(p, Pet.Behavior.CHASE, 20);
@@ -343,6 +433,13 @@ public final class World {
         if (p.blinkTimer <= 0) {
             p.blink = !p.blink;
             p.blinkTimer = p.blink ? 0.14 : 1.5 + rnd.nextDouble() * 4;
+        }
+        if (p.followTime > 0) {
+            p.followTime -= dt;
+            if (p.followTime <= 0) {
+                p.followTime = 0;
+                if (p.behavior == Pet.Behavior.CHASE) setBehavior(p, Pet.Behavior.SIT, 1.5 + rnd.nextDouble() * 2);
+            }
         }
 
         if (!p.leaving && p.fade < 1) p.fade = Math.min(1, p.fade + dt * 2);
@@ -449,7 +546,7 @@ public final class World {
             boolean edgeInsideWindow = edgeX > petSize * 0.5 && edgeX < width - petSize * 0.5;
             double drop = dropBelow(s, edgeX);
             boolean stepOff = edgeInsideWindow && s.y() < height - 2 && (p.behavior == Pet.Behavior.CHASE
-                    ? ball != null && ball.y > p.y
+                    ? chaseTargetBelow(p)
                     : rnd.nextDouble() < (drop < petSize * 6 ? 0.35 : 0.12));
             if (stepOff) {
                 p.x = edgeX; // already past the edge, so the pet does not land back on the surface it left
@@ -469,7 +566,47 @@ public final class World {
         p.x = clampToWorld(nx);
     }
 
+    /** Whatever the chasing pet is after (the ball, or the pointer it follows) is below its current level. */
+    private boolean chaseTargetBelow(Pet p) {
+        if (p.followTime > 0) return !Double.isNaN(pointerY) && pointerY > p.y + petHeight() * 0.5;
+        return ball != null && ball.y > p.y;
+    }
+
+    /** Runs after the mouse pointer along the current surface, and jumps over to the surface under the pointer. */
+    private void tickFollow(Pet p, double dt) {
+        if (Double.isNaN(pointerX)) {
+            p.vx = 0; // the pointer is outside the window: wait for it
+            return;
+        }
+        double dx = pointerX - p.x;
+        Surface under = surfaceUnderPointer();
+        if (under != null && under != p.surface && p.stateTime > 0.4) {
+            if (jumpTo(p, under, pointerX)) return;
+        }
+        if (Math.abs(dx) < petSize * 0.35) {
+            p.vx = 0;
+            return;
+        }
+        p.faceRight = dx > 0;
+        p.vx = Math.signum(dx) * runSpeed() * (Math.abs(dx) > petSize * 3 ? 1 : 0.6);
+        stepAlongSurface(p, dt);
+    }
+
+    /** The first surface at or below the pointer. */
+    private Surface surfaceUnderPointer() {
+        Surface best = null;
+        for (Surface s : surfaces) {
+            if (s.y() < pointerY - petHeight() * 0.5 || !s.spans(pointerX)) continue;
+            if (best == null || s.y() < best.y()) best = s;
+        }
+        return best;
+    }
+
     private void tickChase(Pet p, double dt) {
+        if (p.followTime > 0) {
+            tickFollow(p, dt);
+            return;
+        }
         if (ball == null || p.stateTime > p.stateDuration) {
             setBehavior(p, Pet.Behavior.IDLE, 1 + rnd.nextDouble() * 2);
             return;
@@ -483,7 +620,9 @@ public final class World {
             p.happyTimer = 3;
             p.hearts.add(0.0);
             for (Pet o : pets) {
-                if (o.behavior == Pet.Behavior.CHASE) setBehavior(o, Pet.Behavior.IDLE, 0.5 + rnd.nextDouble() * 2);
+                if (o.behavior == Pet.Behavior.CHASE && o.followTime <= 0) {
+                    setBehavior(o, Pet.Behavior.IDLE, 0.5 + rnd.nextDouble() * 2);
+                }
             }
             setBehavior(p, Pet.Behavior.SIT, 3 + rnd.nextDouble() * 3);
             return;
@@ -541,7 +680,11 @@ public final class World {
         p.vx = 0;
         p.vy = 0;
         p.fallSpeed = 0;
-        if (ball != null && rnd.nextDouble() < 0.8) {
+        if (p.staying) {
+            setBehavior(p, Pet.Behavior.SIT, 2 + rnd.nextDouble() * 4);
+        } else if (p.followTime > 0) {
+            setBehavior(p, Pet.Behavior.CHASE, p.followTime);
+        } else if (ball != null && rnd.nextDouble() < 0.8) {
             setBehavior(p, Pet.Behavior.CHASE, 15);
         } else if (hard) {
             setBehavior(p, Pet.Behavior.SIT, 0.8 + rnd.nextDouble());
@@ -579,6 +722,13 @@ public final class World {
         Surface s = p.surface;
         if (s == null) {
             startFalling(p);
+            return;
+        }
+        if (p.staying) {
+            // staying put: keep sitting, and now and then doze off
+            boolean doze = p.behavior != Pet.Behavior.SLEEP && rnd.nextDouble() < 0.2 + (1 - p.energy) * 0.3;
+            if (doze) setBehavior(p, Pet.Behavior.SLEEP, 15 + rnd.nextDouble() * 20);
+            else setBehavior(p, Pet.Behavior.SIT, 6 + rnd.nextDouble() * 10);
             return;
         }
         double tired = 1 - p.energy;
