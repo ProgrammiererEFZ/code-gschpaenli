@@ -15,7 +15,8 @@
   Color, Adopt (visitors) and Leave. An adopted pet that leaves comes back at the next IDE start or with Roll Call.
 - Settings page with size, speed, activity, name tags, visitors and which IDE parts pets may walk on.
 - New species: cartoon koala (big fluffy ears and nose), sheep (woolly fleece and cap) and lion (mane and tufted
-  tail), and a pixel-art owl that blinks, cocks its head, hops and flaps its wings.
+  tail), and pixel-art owl (blinks, cocks its head, hops and flaps its wings), squirrel (bounds along in hops, sits up
+  to nibble an acorn, sleeps under its bushy tail), ladybug and seal (galumphs along, belly-slides when running).
 
 ### Changed
 

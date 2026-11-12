@@ -62,7 +62,10 @@ final class PetMenu {
             if (p.visitor) g.add(item(overlay, p, "Adopt", "Keep this visitor as your own pet", e -> adopt(overlay, p, e.getProject())));
             return g;
         }
-        g.add(item(overlay, p, "Play Ball", "Toss a ball just for this pet", e -> world.throwBallFor(p)));
+        g.add(item(overlay, p, "Play Ball", "Toss a ball just for this pet", e -> {
+            world.throwBallFor(p);
+            overlay.repaintDirty(); // erase a ball still on screen right away, see PetOverlay.throwBall
+        }));
         if (p.isFollowing()) {
             g.add(item(overlay, p, "Stop Following", "Let it roam on its own again", e -> world.free(p)));
         } else {

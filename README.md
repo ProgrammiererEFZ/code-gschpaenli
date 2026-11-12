@@ -21,7 +21,7 @@ Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm,
 
 - **Two art styles**
   - *Cartoon*: smooth, procedurally drawn cat, dog, fox, bunny, panda, raccoon, hamster, pig, koala, sheep and lion
-  - *Pixel art*: hand-made sprites of a cat, dog, duck, frog, hedgehog, penguin, mouse, turtle and owl
+  - *Pixel art*: hand-made sprites of a cat, dog, duck, frog, hedgehog, penguin, mouse, turtle, owl, squirrel, ladybug and seal
   - Every species comes in several colours.
 - **Pets live on the IDE's own UI.** Each window's Swing hierarchy is scanned for edges (window header, status bar,
   tool window tops, editor tab bars, toolbars, dividers). The horizontal edges become floors and the vertical borders
