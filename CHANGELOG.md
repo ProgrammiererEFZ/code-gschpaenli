@@ -12,3 +12,7 @@
   (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours.
 - Random visitors that drop by and leave again, on by default with 1 to 3 at a time.
 - Settings page with size, speed, activity, name tags, visitors and which IDE parts pets may walk on.
+
+### Changed
+
+- The plugin icon is now pixel art: the orange pixel cat peeking over an edge, paws first.
