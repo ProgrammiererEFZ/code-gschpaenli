@@ -16,3 +16,7 @@
 ### Changed
 
 - The plugin icon is now pixel art: the orange pixel cat peeking over an edge, paws first.
+
+### Fixed
+
+- Cartoon pets' near legs are drawn in front of the light belly and coat markings instead of disappearing behind them.

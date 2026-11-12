@@ -150,9 +150,10 @@ public final class PetRenderer {
 
         List<Part> back = new ArrayList<>();
         List<Part> front = new ArrayList<>();
+        List<Part> nearLegs = new ArrayList<>(); // drawn after the belly and coat details, which would cover them
         for (Leg l : legs) {
             Part part = new Part(legShape(l, sp.legW()), l.far() ? shade(p.leg(), 0.82) : p.leg());
-            (l.far() ? back : front).add(part);
+            (l.far() ? back : nearLegs).add(part);
         }
 
         Point2D tailBase = new Point2D.Double(bodyCX - sp.bodyW() / 2 + 1.5, bodyCY - sp.bodyH() * 0.15);
@@ -173,6 +174,7 @@ public final class PetRenderer {
 
         drawBelly(g, body, p);
         drawCoatDetails(g, kind, p, body, head);
+        group(g, nearLegs, p.outline());
         drawFace(g, kind, p, head, s, false);
 
         g.setTransform(saved);
@@ -200,7 +202,8 @@ public final class PetRenderer {
         Shape haunch = new Ellipse2D.Double(bx - 6.5, -8.5, 10, 8.5);
         front.add(new Part(haunch, p.body()));
         front.add(new Part(new Ellipse2D.Double(bx - 1, -2.6, 5.5, 2.6), p.leg()));
-        front.add(new Part(legShape(new Leg(bx + 4, torsoCY + 2, 0, -(torsoCY + 2), false), sp.legW()), p.leg()));
+        // near front leg: drawn after the belly, which would cover it
+        List<Part> nearLeg = List.of(new Part(legShape(new Leg(bx + 4, torsoCY + 2, 0, -(torsoCY + 2), false), sp.legW()), p.leg()));
 
         double headY = torsoCY - torsoH / 2 - sp.headR() * 0.35 + breath * 0.5;
         Head head = new Head(bx + 4.2, headY, sp.headR());
@@ -218,6 +221,7 @@ public final class PetRenderer {
                 () -> new Ellipse2D.Double(0.5, -torsoH * 0.25, torsoW * 0.75, torsoH * 0.9),
                 () -> rotated(new Ellipse2D.Double(-torsoW / 2, -torsoH / 2, torsoW, torsoH), -0.32, 0, 0),
                 p.belly());
+        group(g, nearLeg, p.outline());
 
         drawFace(g, kind, p, head, s, false);
     }
