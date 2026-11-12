@@ -30,7 +30,7 @@ Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm,
   - Click a pet to pet it (hearts).
   - Drag a pet to pick it up, then throw it.
   - **Tools | Code Gschpänli | Throw Ball** sends every pet chasing a ball.
-- **Random visitors:** optionally, a changing crowd of pets drops by, stays one to eight minutes, and walks off again.
+- **Random visitors:** on by default, a changing crowd of one to three pets drops by, stays one to eight minutes, and walks off again.
   You set the range, for example "between 1 and 3 at a time". Use the same number twice for a fixed count.
 - **Settings** (*Settings | Tools | Code Gschpänli*):
   - size, speed and activity

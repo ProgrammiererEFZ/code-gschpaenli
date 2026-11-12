@@ -96,8 +96,8 @@ public final class PetsSettings implements PersistentStateComponent<PetsSettings
         public boolean walkOnPanels = true;
         public boolean firstRun = true;
 
-        /** Random visitors that come and go on their own, in addition to the adopted pets. */
-        public boolean visitorsEnabled = false;
+        /** Random visitors that come and go on their own, in addition to the adopted pets. On by default, 1 to 3 at a time. */
+        public boolean visitorsEnabled = true;
         public int visitorsMin = 1;
         public int visitorsMax = 3;
         public boolean visitorsCartoon = true;
