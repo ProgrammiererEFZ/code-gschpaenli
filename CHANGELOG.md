@@ -10,5 +10,5 @@
   climb tool window borders, jump between surfaces and chase balls you throw.
 - Two art styles: smooth cartoon pets (cat, dog, fox, bunny, panda, raccoon, hamster, pig) and pixel-art pets
   (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours.
-- Random visitors that drop by and leave again.
+- Random visitors that drop by and leave again, on by default with 1 to 3 at a time.
 - Settings page with size, speed, activity, name tags, visitors and which IDE parts pets may walk on.
