@@ -93,7 +93,8 @@ public enum PetKind {
     PIXEL_MOUSE("Mouse", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.mousePalettes()),
     PIXEL_TURTLE("Turtle", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.turtlePalettes()),
     PIXEL_OWL("Owl", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.owlPalettes()),
-    PIXEL_SQUIRREL("Squirrel", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.squirrelPalettes());
+    PIXEL_SQUIRREL("Squirrel", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.squirrelPalettes()),
+    PIXEL_LADYBUG("Ladybug", Group.PIXEL, null, io.github.programmiererefz.codegschpaenli.pixel.PixelArt.ladybugPalettes());
 
     /** The two art styles: smooth vector "cartoon" pets and hand-made pixel-art pets. */
     public enum Group {

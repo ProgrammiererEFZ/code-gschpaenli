@@ -35,6 +35,7 @@ public final class PetNames {
     private static final List<String> SHEEP = List.of("Woolly", "Dolly", "Fleecy", "Baabara", "Cotton", "Shaun");
     private static final List<String> LION = List.of("Leo", "Simba", "Nala", "Mufasa", "Sunny", "Roary");
     private static final List<String> OWL = List.of("Hoot", "Hedwig", "Athena", "Nightly", "Archimedes", "Hooty");
+    private static final List<String> LADYBUG = List.of("Dotty", "Scarlet", "Polka", "Breakpoint", "Spotty", "Bugsy", "Lady");
 
     private PetNames() {
     }
@@ -60,6 +61,7 @@ public final class PetNames {
             case "LION" -> LION;
             case "OWL" -> OWL;
             case "SQUIRREL" -> SQUIRREL;
+            case "LADYBUG" -> LADYBUG;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -89,6 +91,7 @@ public final class PetNames {
             case "LION" -> "Roar! I'm the king of this codebase.";
             case "OWL" -> "Hoo! Still up debugging? Me too.";
             case "SQUIRREL" -> "*buries a nut* I stashed your snippets for winter.";
+            case "LADYBUG" -> "*flutters* Relax, I'm the only bug you'll ever want in your code.";
             default -> "Hello!";
         };
     }
