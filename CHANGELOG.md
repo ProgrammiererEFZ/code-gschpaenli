@@ -17,6 +17,8 @@
 - New species: cartoon koala (big fluffy ears and nose), sheep (woolly fleece and cap) and lion (mane and tufted
   tail), and pixel-art owl (blinks, cocks its head, hops and flaps its wings), squirrel (bounds along in hops, sits up
   to nibble an acorn, sleeps under its bushy tail), ladybug and seal (galumphs along, belly-slides when running).
+- More pixel-art species: chicken, axolotl, parrot, cockatoo (crest fans up when excited), bee, crab, snail, bat,
+  ocelot and otter, each in several colours.
 
 ### Changed
 
