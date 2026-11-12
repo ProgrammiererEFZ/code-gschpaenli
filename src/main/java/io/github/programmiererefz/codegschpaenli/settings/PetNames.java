@@ -29,6 +29,7 @@ public final class PetNames {
     private static final List<String> PIG = List.of("Truffle", "Hamlet", "Oinkers", "Peppa", "Bacon", "Snout");
     private static final List<String> PENGUIN = List.of("Tux", "Pebble", "Waddle", "Flipper", "Iceberg", "Pingu");
     private static final List<String> MOUSE = List.of("Squeak", "Cheddar", "Whisper", "Click", "Brie", "Scroll");
+    private static final List<String> SQUIRREL = List.of("Hazelnut", "Acorn", "Chip", "Nutmeg", "Scamper", "Cache");
     private static final List<String> TURTLE = List.of("Shelly", "Tortellini", "Speedy", "Sheldon", "Crush", "Mossy");
     private static final List<String> KOALA = List.of("Eucalyptus", "Kip", "Gumtree", "Matilda", "Snoozy", "Bluey");
     private static final List<String> SHEEP = List.of("Woolly", "Dolly", "Fleecy", "Baabara", "Cotton", "Shaun");
@@ -58,6 +59,7 @@ public final class PetNames {
             case "SHEEP" -> SHEEP;
             case "LION" -> LION;
             case "OWL" -> OWL;
+            case "SQUIRREL" -> SQUIRREL;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -86,6 +88,7 @@ public final class PetNames {
             case "SHEEP" -> "Baa! I've been counting your bugs to fall asleep.";
             case "LION" -> "Roar! I'm the king of this codebase.";
             case "OWL" -> "Hoo! Still up debugging? Me too.";
+            case "SQUIRREL" -> "*buries a nut* I stashed your snippets for winter.";
             default -> "Hello!";
         };
     }
