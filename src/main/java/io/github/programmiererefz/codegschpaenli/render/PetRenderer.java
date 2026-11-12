@@ -161,18 +161,21 @@ public final class PetRenderer {
 
         Ellipse2D body = new Ellipse2D.Double(bodyCX - sp.bodyW() / 2, bodyCY - sp.bodyH() / 2, sp.bodyW(), sp.bodyH());
         front.add(0, new Part(body, p.body()));
+        addWool(front, sp, p, bodyCX, bodyCY, sp.bodyW(), sp.bodyH(), 0, false);
 
         Head head = new Head(headX, headY, sp.headR());
         List<Part> over = new ArrayList<>();
+        addMane(front, sp, p, head, s);
         addEars(back, front, over, sp, p, head, pose == Pose.RUN || pose == Pose.FALL || pose == Pose.JUMP, s, false);
-        front.add(new Part(head.circle(), p.body()));
+        front.add(new Part(head.circle(), headFill(sp, p)));
         addSnoutParts(front, sp, p, head);
         front.addAll(over);
 
         group(g, back, p.outline());
         group(g, front, p.outline());
+        drawWoolCap(g, sp, p, head, s, pose == Pose.RUN || pose == Pose.FALL || pose == Pose.JUMP, false);
 
-        drawBelly(g, body, p);
+        if (sp.coat() != PetKind.Coat.WOOL) drawBelly(g, body, p);
         drawCoatDetails(g, kind, p, body, head);
         group(g, nearLegs, p.outline());
         drawFace(g, kind, p, head, s, false);
@@ -201,6 +204,8 @@ public final class PetRenderer {
         front.add(new Part(torso, p.body()));
         Shape haunch = new Ellipse2D.Double(bx - 6.5, -8.5, 10, 8.5);
         front.add(new Part(haunch, p.body()));
+        addWool(front, sp, p, bx, torsoCY, torsoW, torsoH, -0.32, false);
+        addWool(front, sp, p, bx - 1.5, -4.25, 10, 8.5, 0, true);
         front.add(new Part(new Ellipse2D.Double(bx - 1, -2.6, 5.5, 2.6), p.leg()));
         // near front leg: drawn after the belly, which would cover it
         List<Part> nearLeg = List.of(new Part(legShape(new Leg(bx + 4, torsoCY + 2, 0, -(torsoCY + 2), false), sp.legW()), p.leg()));
@@ -208,16 +213,19 @@ public final class PetRenderer {
         double headY = torsoCY - torsoH / 2 - sp.headR() * 0.35 + breath * 0.5;
         Head head = new Head(bx + 4.2, headY, sp.headR());
         List<Part> over = new ArrayList<>();
+        addMane(front, sp, p, head, s);
         addEars(back, front, over, sp, p, head, false, s, false);
-        front.add(new Part(head.circle(), p.body()));
+        front.add(new Part(head.circle(), headFill(sp, p)));
         addSnoutParts(front, sp, p, head);
         front.addAll(over);
 
         group(g, back, p.outline());
         group(g, front, p.outline());
+        drawWoolCap(g, sp, p, head, s, false, false);
 
         // belly, in a frame centred on the torso
-        fillWithin(g, AffineTransform.getTranslateInstance(bx, torsoCY), new WithinKey(Within.SIT_BELLY, torsoW, torsoH),
+        if (sp.coat() != PetKind.Coat.WOOL) fillWithin(g, AffineTransform.getTranslateInstance(bx, torsoCY),
+                new WithinKey(Within.SIT_BELLY, torsoW, torsoH),
                 () -> new Ellipse2D.Double(0.5, -torsoH * 0.25, torsoW * 0.75, torsoH * 0.9),
                 () -> rotated(new Ellipse2D.Double(-torsoW / 2, -torsoH / 2, torsoW, torsoH), -0.32, 0, 0),
                 p.belly());
@@ -236,6 +244,7 @@ public final class PetRenderer {
         List<Part> back = new ArrayList<>();
         List<Part> front = new ArrayList<>();
         front.add(new Part(body, p.body()));
+        addWool(front, sp, p, 0, -bodyH / 2 - 0.2, bodyW, bodyH, 0, true);
 
         Point2D tailBase = new Point2D.Double(-bodyW / 2 + 1.5, -1.6);
         if (sp.tail() == PetKind.Tail.THIN || sp.tail() == PetKind.Tail.BUSHY || sp.tail() == PetKind.Tail.RINGED) {
@@ -247,13 +256,15 @@ public final class PetRenderer {
         front.add(new Part(new Ellipse2D.Double(bodyW / 2 - 2.5, -2.6, 6, 2.6), p.leg()));
         Head head = new Head(bodyW / 2 - 2.2, -sp.headR() + 0.2, sp.headR() * 0.97);
         List<Part> over = new ArrayList<>();
+        addMane(front, sp, p, head, s);
         addEars(back, front, over, sp, p, head, false, s, true);
-        front.add(new Part(head.circle(), p.body()));
+        front.add(new Part(head.circle(), headFill(sp, p)));
         addSnoutParts(front, sp, p, head);
         front.addAll(over);
 
         group(g, back, p.outline());
         group(g, front, p.outline());
+        drawWoolCap(g, sp, p, head, s, false, true);
 
         // Shaded back. Breathing changes the body's height, which a translation cannot follow, so the shading is cached
         // for heights 1/8 unit apart and stretched to the current one around the body's bottom edge (y = -0.2): that
@@ -261,7 +272,8 @@ public final class PetRenderer {
         double cachedH = sp.bodyH() * 0.82 + Math.rint(breath * 8) / 8;
         AffineTransform place = AffineTransform.getTranslateInstance(0, -0.2);
         place.scale(1, bodyH / cachedH);
-        fillWithin(g, place, new WithinKey(Within.LIE_SHADE, bodyW, cachedH),
+        // (not on a fleece: its puffy top would show the shading's flat edge)
+        if (sp.coat() != PetKind.Coat.WOOL) fillWithin(g, place, new WithinKey(Within.LIE_SHADE, bodyW, cachedH),
                 () -> new Ellipse2D.Double(-bodyW / 2, -cachedH * 1.4 + 0.2, bodyW, cachedH * 0.8),
                 () -> new Ellipse2D.Double(-bodyW / 2, -cachedH, bodyW, cachedH),
                 shade(p.body(), 0.92));
@@ -359,6 +371,31 @@ public final class PetRenderer {
             }
             case PUFF -> parts.add(new Part(new Ellipse2D.Double(x - 3.2, y - 2.6, 5.2, 5.2), p.tailTip()));
             case STUB -> parts.add(new Part(new Ellipse2D.Double(x - 2.2, y - 1.6, 3.2, 3.0), p.tailTip()));
+            case TUFT -> {
+                // a lion's tail: thin, with a tuft at the end
+                Path2D path = new Path2D.Double();
+                path.moveTo(x, y);
+                double ex, ey;
+                switch (mode) {
+                    case UP -> {
+                        ex = x - 9 + wag;
+                        ey = y - 7.5;
+                        path.curveTo(x - 5, y + 1.5, x - 7.5, y - 2, ex, ey);
+                    }
+                    case GROUND -> {
+                        ex = x - 10.5 + wag * 0.4;
+                        ey = y - 2.5;
+                        path.curveTo(x - 4, y + 2, x - 8.5, y + 2, ex, ey);
+                    }
+                    default -> {
+                        ex = x + 12.5 + wag * 0.3;
+                        ey = y + 0.4;
+                        path.curveTo(x - 3, y + 1.6, x + 6, y + 1.8, ex, ey);
+                    }
+                }
+                parts.add(new Part(stroke(path, 1.7f), p.body()));
+                parts.add(new Part(new Ellipse2D.Double(ex - 1.9, ey - 2.0, 3.8, 4.0), p.tailTip()));
+            }
             case CURLY -> {
                 // a little corkscrew that springs about its base
                 Path2D path = new Path2D.Double();
@@ -512,6 +549,24 @@ public final class PetRenderer {
                 back.add(new Part(new Ellipse2D.Double(h.x() - 3.6 - 2.5, h.y() - r - 1.2, 5, 5), p.ear()));
                 front.add(new Part(new Ellipse2D.Double(h.x() + 1.6 - 2.5, h.y() - r - 1.6, 5, 5), p.ear()));
             }
+            case FLUFFY -> {
+                // big round ears on the sides of the head, the near one with a light tuft
+                double er = r * 0.56;
+                double lift = lying ? 0.8 : 0;
+                double fx = h.x() - r * 0.9, fy = h.y() - r * 0.55 + lift;
+                back.add(new Part(new Ellipse2D.Double(fx - er, fy - er, 2 * er, 2 * er), shade(p.body(), 0.9)));
+                double nx = h.x() - r * 0.12 - flick * 0.1, ny = h.y() - r * 0.82 + lift;
+                front.add(new Part(new Ellipse2D.Double(nx - er, ny - er, 2 * er, 2 * er), p.body()));
+                front.add(new Part(new Ellipse2D.Double(nx - er * 0.62, ny - er * 0.7, er * 1.2, er * 1.1), p.ear()));
+            }
+            case SIDE -> {
+                // leaf-shaped ears sticking out sideways from under the fleece
+                double flapA = flap ? Math.sin(s.time() * 12) * 0.2 : 0;
+                double fx = h.x() - r * 0.3, fy = h.y() - r * 0.6;
+                back.add(new Part(rotated(new Ellipse2D.Double(fx - 5.4, fy - 1.2, 5.8, 2.4), 0.45 + (lying ? -0.3 : 0) + flapA, fx, fy),
+                        shade(p.ear(), 0.85)));
+                if (sp.coat() != PetKind.Coat.WOOL) over.add(sideEar(h, p, s, flap, lying)); // else drawn by drawWoolCap
+            }
         }
     }
 
@@ -529,6 +584,70 @@ public final class PetRenderer {
             case 3 -> front.add(new Part(new Ellipse2D.Double(h.x() + h.r() - 1.4, h.y() - 0.3, 4.4, 4.0), p.accent()));
             default -> {
             }
+        }
+    }
+
+    /** The colour of the head: body colour, except for woolly pets whose face matches their legs. */
+    private static Color headFill(Spec sp, Palette p) {
+        return sp.coat() == PetKind.Coat.WOOL ? p.leg() : p.body();
+    }
+
+    /**
+     * Fleece: puffs around the edge of an ellipse (centre, size, rotation around its centre) that give the body a
+     * cloudy outline. {@code upperOnly} leaves out the puffs on the ground.
+     */
+    private static void addWool(List<Part> parts, Spec sp, Palette p, double cx, double cy, double w, double h,
+                                double rot, boolean upperOnly) {
+        if (sp.coat() != PetKind.Coat.WOOL) return;
+        double pr = 2.5;
+        int n = Math.max(8, (int) Math.round(Math.PI * (w + h) / 2 / 3.6));
+        double c = Math.cos(rot), sn = Math.sin(rot);
+        for (int i = 0; i < n; i++) {
+            double a = 2 * Math.PI * (i + 0.5) / n;
+            if (upperOnly && Math.sin(a) > 0.35) continue;
+            double px = (w / 2 - pr * 0.55) * Math.cos(a);
+            double py = (h / 2 - pr * 0.55) * Math.sin(a);
+            double qx = cx + px * c - py * sn, qy = cy + px * sn + py * c;
+            parts.add(new Part(new Ellipse2D.Double(qx - pr, qy - pr, 2 * pr, 2 * pr), p.body()));
+        }
+    }
+
+    /** The near one of the {@link PetKind.Ears#SIDE} ears, sticking out backwards from the side of the head. */
+    private static Part sideEar(Head h, Palette p, State s, boolean flap, boolean lying) {
+        double flapA = flap ? Math.sin(s.time() * 12) * 0.2 : 0;
+        double flick = Math.max(0, Math.sin(s.time() * 0.9) - 0.96) * 12;
+        double nx = h.x() - h.r() * 0.45, ny = h.y() - h.r() * 0.35;
+        return new Part(rotated(new Ellipse2D.Double(nx - 6.2, ny - 1.4, 6.6, 2.8),
+                (lying ? -0.25 : 0.1) - flapA + flick * 0.04, nx, ny), p.ear());
+    }
+
+    /** A sheep's woolly cap over the top and back of the head (and the roots of its ears), outlined over the face. */
+    private static void drawWoolCap(Graphics2D g, Spec sp, Palette p, Head h, State s, boolean flap, boolean lying) {
+        if (sp.coat() != PetKind.Coat.WOOL) return;
+        double r = h.r();
+        List<Part> cap = new ArrayList<>();
+        if (sp.ears() == PetKind.Ears.SIDE) cap.add(sideEar(h, p, s, flap, lying));
+        for (double[] c : new double[][]{{-0.75, -0.45, 0.48}, {-0.3, -0.85, 0.5}, {0.25, -0.98, 0.4}}) {
+            double pr = c[2] * r;
+            cap.add(new Part(new Ellipse2D.Double(h.x() + c[0] * r - pr, h.y() + c[1] * r - pr, 2 * pr, 2 * pr), p.body()));
+        }
+        group(g, cap, p.outline());
+    }
+
+    /** A lion's mane: a scalloped ring behind the head, framing the face. */
+    private static void addMane(List<Part> parts, Spec sp, Palette p, Head h, State s) {
+        if (sp.coat() != PetKind.Coat.MANE) return;
+        double r = h.r();
+        double cx = h.x() - r * 0.35, cy = h.y() + r * 0.12;
+        double rr = r + 1.0;
+        parts.add(new Part(new Ellipse2D.Double(cx - rr, cy - rr, 2 * rr, 2 * rr), p.accent()));
+        double sway = Math.sin(s.time() * 1.3) * 0.06;
+        int n = 12;
+        for (int i = 0; i < n; i++) {
+            double a = 2 * Math.PI * i / n + sway;
+            double pr = 2.3 + 0.4 * Math.cos(a * 2);
+            double px = cx + rr * Math.cos(a), py = cy + rr * 1.05 * Math.sin(a);
+            parts.add(new Part(new Ellipse2D.Double(px - pr, py - pr, 2 * pr, 2 * pr), p.accent()));
         }
     }
 
@@ -565,6 +684,14 @@ public final class PetRenderer {
             g.setStroke(new BasicStroke(0.9f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(new java.awt.geom.Line2D.Double(h.x() - 0.6, h.y() - h.r() + 0.6, h.x() - 0.2, h.y() - h.r() + 2.4));
             g.draw(new java.awt.geom.Line2D.Double(h.x() + 1.2, h.y() - h.r() + 0.5, h.x() + 1.2, h.y() - h.r() + 2.2));
+        }
+        if (kind.spec().coat() == PetKind.Coat.WOOL) {
+            g.setColor(p.accent());
+            g.setStroke(new BasicStroke(0.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            double cx = body.getCenterX(), cy = body.getCenterY();
+            for (double[] c : new double[][]{{-5.5, -2.2}, {-1, -3.4}, {3.6, -1.6}, {-3.2, 1.6}, {1.6, 1.8}}) {
+                g.draw(new java.awt.geom.Arc2D.Double(cx + c[0] - 1.2, cy + c[1] - 1.0, 2.4, 2.0, 200, 230, java.awt.geom.Arc2D.OPEN));
+            }
         }
         double w = body.getWidth();
         double bh = body.getHeight();
@@ -639,6 +766,16 @@ public final class PetRenderer {
             case 3 -> {
                 g.fill(new Ellipse2D.Double(x + r + 0.2, y + 1.0, 0.9, 1.4));
                 g.fill(new Ellipse2D.Double(x + r + 1.6, y + 1.0, 0.9, 1.4));
+            }
+            case 4 -> {
+                // a koala's big nose, overlapping the edge of the face
+                Shape n = new RoundRectangle2D.Double(x + r - 2.4, y - 0.6, 3.8, 4.8, 3.4, 3.6);
+                g.fill(n);
+                g.setColor(p.outline());
+                g.setStroke(new BasicStroke(0.6f));
+                g.draw(n);
+                g.setColor(withAlpha(Color.WHITE, 110));
+                g.fill(new Ellipse2D.Double(x + r - 1.4, y + 0.1, 1.3, 1.0));
             }
             default -> {
                 Path2D n = new Path2D.Double();
