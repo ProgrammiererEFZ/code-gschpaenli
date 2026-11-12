@@ -41,6 +41,7 @@ public final class PetNames {
     private static final List<String> AXOLOTL = List.of("Axel", "Gilly", "Lotl", "Bubbles", "Frilly", "Mochi");
     private static final List<String> PARROT = List.of("Polly", "Kiwi", "Mango", "Echo", "Captain", "Rio", "Paprika");
     private static final List<String> COCKATOO = List.of("Crest", "Sunny", "Snowball", "Cookie", "Banjo", "Mohawk");
+    private static final List<String> BEE = List.of("Buzz", "Honey", "Bumble", "Pollen", "Beeswax", "Clover", "Stinger");
 
     private PetNames() {
     }
@@ -72,6 +73,7 @@ public final class PetNames {
             case "AXOLOTL" -> AXOLOTL;
             case "PARROT" -> PARROT;
             case "COCKATOO" -> COCKATOO;
+            case "BEE" -> BEE;
             default -> COMMON;
         };
         ThreadLocalRandom r = ThreadLocalRandom.current();
@@ -107,6 +109,7 @@ public final class PetNames {
             case "AXOLOTL" -> "*wiggles gills* I regenerate, you refactor. Same thing really.";
             case "PARROT" -> "Squawk! Hello world! Hello world! *repeats it until it compiles*";
             case "COCKATOO" -> "*raises crest* SCREECH! Oh, sorry. Is this a meeting?";
+            case "BEE" -> "Bzzz! Busy as a bee, pollinating your pull requests.";
             default -> "Hello!";
         };
     }
