@@ -66,6 +66,8 @@ public final class Pet {
     public double fade = 1;
     boolean fadingOut;
     double leaveTime;
+    /** Just added and not yet placed: the world picks a spot on its next tick, once the surfaces are known. */
+    boolean spawnPending;
 
     /** Told to stay: the pet sits (and may doze off) where it is until released. It still falls if its floor goes. */
     public boolean staying;

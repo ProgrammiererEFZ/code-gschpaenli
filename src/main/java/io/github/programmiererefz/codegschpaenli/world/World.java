@@ -196,24 +196,114 @@ public final class World {
     // Pets
     // ------------------------------------------------------------------------------------------------------------
 
-    /** Adds a pet that drops in from the top at a random x. */
+    /**
+     * Adds a pet that fades in somewhere in the window. Where is decided on the next {@link #tick}, once the surfaces
+     * of a freshly opened window are known: it either pops up on a random surface or appears part way up a climbable
+     * wall and climbs to the surface above (see {@link #placeNewPet}).
+     */
     public Pet addPet(String id, PetKind kind, PetKind.Palette palette, String name) {
         Pet p = new Pet(id, kind, palette, name);
-        p.x = clampToWorld(petSize + rnd.nextDouble() * Math.max(1, width - 2 * petSize));
+        p.x = width / 2;
         p.y = petHeight() + 2;
         p.faceRight = rnd.nextBoolean();
         p.energy = 0.6 + rnd.nextDouble() * 0.4;
+        p.fade = 0;
+        p.spawnPending = true;
         startFalling(p);
         pets.add(p);
         return p;
     }
 
-    /** Adds a visitor that drops in and fades in. */
+    /** Adds a visitor that appears like any new pet (see {@link #addPet}). */
     public Pet addVisitor(String id, PetKind kind, PetKind.Palette palette, String name) {
         Pet p = addPet(id, kind, palette, name);
         p.visitor = true;
-        p.fade = 0;
         return p;
+    }
+
+    /** Share of new pets that appear climbing a wall rather than on a surface (when a suitable wall exists). */
+    private static final double CLIMB_SPAWN_CHANCE = 0.35;
+
+    /** Picks the spot where a just-added pet appears. */
+    private void placeNewPet(Pet p) {
+        p.spawnPending = false;
+        if (rnd.nextDouble() < CLIMB_SPAWN_CHANCE && spawnClimbing(p)) return;
+        if (spawnOnSurface(p)) return;
+        // no surfaces known at all: drop in from the top
+        p.x = clampToWorld(petSize + rnd.nextDouble() * Math.max(1, width - 2 * petSize));
+        p.y = petHeight() + 2;
+    }
+
+    /**
+     * Lets the pet pop up on a random surface, with a little drop onto it. Every surface gets a chance, weighted by
+     * the square root of its usable width so that long bars are likelier without crowding out the short ones.
+     */
+    private boolean spawnOnSurface(Pet p) {
+        List<Surface> candidates = new ArrayList<>();
+        List<Double> weights = new ArrayList<>();
+        double total = 0;
+        for (Surface s : surfaces) {
+            double usable = usableHi(s) - usableLo(s);
+            if (usable < petSize * 0.3) continue;
+            double w = Math.sqrt(usable);
+            candidates.add(s);
+            weights.add(w);
+            total += w;
+        }
+        if (candidates.isEmpty()) return false;
+        double r = rnd.nextDouble() * total;
+        Surface s = candidates.getLast();
+        for (int i = 0; i < candidates.size(); i++) {
+            r -= weights.get(i);
+            if (r <= 0) {
+                s = candidates.get(i);
+                break;
+            }
+        }
+        double lo = usableLo(s);
+        double hi = usableHi(s);
+        p.x = lo + rnd.nextDouble() * Math.max(0, hi - lo);
+        p.y = s.y() - petHeight() * 0.6;
+        startFalling(p);
+        return true;
+    }
+
+    /** Left end of the part of a surface a pet can stand on (surfaces may reach past the window sides). */
+    private double usableLo(Surface s) {
+        return Math.max(s.x1() + petSize * 0.15, petSize * 0.5);
+    }
+
+    private double usableHi(Surface s) {
+        return Math.min(s.x2() - petSize * 0.15, width - petSize * 0.5);
+    }
+
+    /**
+     * Puts the pet part way up a random climbable wall (the window sides included), climbing towards a surface
+     * above it.
+     */
+    private boolean spawnClimbing(Pet p) {
+        record Option(Wall wall, int side, double y, Surface target) {
+        }
+        List<Option> options = new ArrayList<>();
+        double half = petSize * 0.5;
+        for (Wall w : walls) {
+            for (int side : new int[]{+1, -1}) {
+                if (side > 0 && !w.fromLeft() || side < 0 && !w.fromRight()) continue;
+                // p.y is the middle of the climbing pet's body: keep it all on the wall and inside the window
+                double yLo = w.y1() + half + petSize * 1.5; // leave at least a little climbing to do
+                double yHi = Math.min(w.y2(), height - 1) - half;
+                if (yHi <= yLo) continue;
+                double y = yLo + rnd.nextDouble() * (yHi - yLo);
+                Surface target = nearestSurfaceAbove(w, side, y);
+                // the target must be clearly above the pet's head
+                if (target == null || target.y() > y - half - petSize) continue;
+                options.add(new Option(w, side, y, target));
+            }
+        }
+        if (options.isEmpty()) return false;
+        Option o = options.get(rnd.nextInt(options.size()));
+        beginClimb(p, o.wall(), o.side(), false, o.target(), o.y());
+        return true;
     }
 
     /** Makes a pet leave: it walks towards the nearest window side, fades out and is then removed. */
@@ -239,6 +329,7 @@ public final class World {
         double h = petHeight() * 0.85;
         for (int i = pets.size() - 1; i >= 0; i--) {
             Pet p = pets.get(i);
+            if (p.spawnPending) continue; // not placed yet
             if (p.behavior == Pet.Behavior.CLIMB) {
                 // rotated: the body sticks out sideways from the wall, centred on p.y
                 double dx = (px - p.x) * -p.climbSide;
@@ -416,6 +507,9 @@ public final class World {
     public void tick(double dt) {
         dt = Math.min(dt, 0.1);
         if (ball != null) tickBall(dt);
+        for (Pet p : pets) {
+            if (p.spawnPending) placeNewPet(p);
+        }
         for (Pet p : pets) tickPet(p, dt);
         pets.removeIf(p -> p.leaving && p.fade <= 0);
     }
@@ -860,6 +954,10 @@ public final class World {
         }
         // going up the pet starts with its feet on the surface; going down it hangs just below the edge
         double startY = down ? p.y + petSize * 0.5 : p.y - petSize * 0.5;
+        beginClimb(p, w, side, down, target, startY);
+    }
+
+    private void beginClimb(Pet p, Wall w, int side, boolean down, Surface target, double startY) {
         setBehavior(p, Pet.Behavior.CLIMB, 120);
         p.climbDown = down;
         p.surface = null;
