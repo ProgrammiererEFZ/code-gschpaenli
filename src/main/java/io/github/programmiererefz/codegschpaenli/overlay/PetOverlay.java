@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * A transparent component on top of an IDE frame's layered pane that draws the pets. It only claims mouse
@@ -172,6 +173,10 @@ final class PetOverlay extends JComponent {
 
     void throwBall() {
         world.throwBall();
+        // Erase the previous ball and draw the new one now. Waiting for the next tick is not enough: while the window
+        // is paused (e.g. Find Action has focus) no tick runs, but the IDE keeps repainting parts of the window, which
+        // would show the new ball next to the old one still on screen.
+        repaintDirty();
     }
 
     /** Whether this overlay currently has anything to animate. */
@@ -224,7 +229,7 @@ final class PetOverlay extends JComponent {
      * Repaints only the areas around each pet (old and new position). Uses paintImmediately per area, because
      * repaint() would merge far-apart pets into one huge dirty rectangle and repaint most of the IDE every frame.
      */
-    private void repaintDirty() {
+    void repaintDirty() {
         List<Rectangle> dirty = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         for (Pet p : world.pets()) {
@@ -247,17 +252,23 @@ final class PetOverlay extends JComponent {
         }
         lastBallRect = ballNow;
 
-        RepaintManager rm = RepaintManager.currentManager(this);
         for (Rectangle r : mergeOverlapping(dirty)) {
             Rectangle clipped = r.intersection(new Rectangle(0, 0, getWidth(), getHeight()));
             if (clipped.isEmpty()) continue;
             PerfProbe.addRepaintedArea(clipped);
-            paintImmediately(clipped);
-            // When no ancestor up to the window is opaque (the IDE's root pane on Windows), paintImmediately() quietly
-            // becomes a deferred repaint of the window, and Swing merges those into one rectangle spanning all pets.
-            // Painting the pending region right away keeps each area separate. A no-op when nothing is pending.
-            rm.paintDirtyRegions();
+            regionPainter.accept(clipped);
         }
+    }
+
+    /** Paints one dirty area right away. Replaced by tests, which have no screen to paint to. */
+    Consumer<Rectangle> regionPainter = this::paintNow;
+
+    private void paintNow(Rectangle r) {
+        paintImmediately(r);
+        // When no ancestor up to the window is opaque (the IDE's root pane on Windows), paintImmediately() quietly
+        // becomes a deferred repaint of the window, and Swing merges those into one rectangle spanning all pets.
+        // Painting the pending region right away keeps each area separate. A no-op when nothing is pending.
+        RepaintManager.currentManager(this).paintDirtyRegions();
     }
 
     private static List<Rectangle> mergeOverlapping(List<Rectangle> rects) {

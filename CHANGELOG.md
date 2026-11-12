@@ -12,3 +12,8 @@
   (cat, dog, duck, frog, hedgehog, penguin, mouse, turtle), each in several colours.
 - Random visitors that drop by and leave again.
 - Settings page with size, speed, activity, name tags, visitors and which IDE parts pets may walk on.
+
+### Fixed
+
+- Throwing a ball while the previous one was still around could show both balls at once when the animation was
+  paused, e.g. because the Find Action popup had focus.
