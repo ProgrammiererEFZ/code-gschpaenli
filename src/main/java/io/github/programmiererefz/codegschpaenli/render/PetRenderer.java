@@ -384,7 +384,8 @@ public final class PetRenderer {
      * The bushy tail for a wag offset. Its tip is the circle around the end of the tail intersected with the tail, an
      * expensive {@link Area} operation, so both are cached. The wag varies continuously and is rounded to
      * {@link #BUSHY_WAG_STEPS} positions per unit to make the cache work; that moves the tail by less than 1/100 of a
-     * unit, which no screen shows.
+     * unit, which no screen shows (the tail is where it would be a fraction of a frame earlier or later). The wag stays
+     * within ±2 units, so the cache is bounded: about 1.5 MB with every position of both tail kinds in every pose.
      */
     private static BushyTail bushyTail(TailMode mode, double wag, boolean ringed) {
         return BUSHY_TAILS.computeIfAbsent(new BushyTailKey(mode, Math.round(wag * BUSHY_WAG_STEPS), ringed), k -> {
