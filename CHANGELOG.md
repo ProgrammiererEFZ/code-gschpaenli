@@ -20,3 +20,5 @@
 ### Fixed
 
 - Cartoon pets' near legs are drawn in front of the light belly and coat markings instead of disappearing behind them.
+- Throwing a ball while the previous one was still around could show both balls at once when the animation was
+  paused, e.g. because the Find Action popup had focus.
