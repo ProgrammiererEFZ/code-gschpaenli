@@ -56,6 +56,7 @@ final class PetOverlay extends JComponent {
 
     private final JRootPane rootPane;
     private final JLayeredPane layeredPane;
+    private final PetOverlays owner;
     private final World world;
     private final Visitors visitors;
     private final ComponentAdapter resizeListener;
@@ -74,10 +75,13 @@ final class PetOverlay extends JComponent {
     private final double[] lastMouse = new double[3]; // x, y, nanos
     private double throwVx;
     private double throwVy;
+    /** Pet under the last right-button press, for platforms whose popup trigger is the release. */
+    private Pet menuPet;
 
-    PetOverlay(JRootPane rootPane, long seed) {
+    PetOverlay(JRootPane rootPane, long seed, PetOverlays owner) {
         this.rootPane = rootPane;
         this.layeredPane = rootPane.getLayeredPane();
+        this.owner = owner;
         this.world = new World(seed);
         this.visitors = new Visitors(world, seed * 31 + 7);
         setOpaque(false);
@@ -126,6 +130,10 @@ final class PetOverlay extends JComponent {
         return world;
     }
 
+    PetOverlays owner() {
+        return owner;
+    }
+
     private void updateBounds() {
         setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
         world.setBounds(layeredPane.getWidth(), layeredPane.getHeight());
@@ -156,14 +164,17 @@ final class PetOverlay extends JComponent {
         }
         Set<String> have = new HashSet<>();
         for (Pet p : world.pets()) have.add(p.id);
-        // a pet whose look or name changed is re-created
+        // a pet of another species is re-created; a new colour or name is applied in place
         for (PetsSettings.PetEntry e : s.pets) {
+            if (owner.isAway(e.id)) continue; // sent home for now
             Pet existing = null;
             for (Pet p : world.pets()) if (p.id.equals(e.id)) existing = p;
-            if (existing != null && (existing.kind != e.petKind() || !existing.palette.equals(e.palette())
-                    || !existing.name.equals(e.name))) {
+            if (existing != null && existing.kind != e.petKind()) {
                 world.removePet(e.id);
                 have.remove(e.id);
+            } else if (existing != null) {
+                existing.palette = e.palette();
+                existing.name = e.name;
             }
             if (!have.contains(e.id)) world.addPet(e.id, e.petKind(), e.palette(), e.name);
         }
@@ -177,6 +188,13 @@ final class PetOverlay extends JComponent {
         // is paused (e.g. Find Action has focus) no tick runs, but the IDE keeps repainting parts of the window, which
         // would show the new ball next to the old one still on screen.
         repaintDirty();
+    }
+
+    /** The pet walks off and goes away (see {@link PetOverlays#sendHome}). */
+    void sendAway(String id) {
+        for (Pet p : world.pets()) {
+            if (p.id.equals(id)) world.sendAway(p);
+        }
     }
 
     /** Whether this overlay currently has anything to animate. */
@@ -219,6 +237,7 @@ final class PetOverlay extends JComponent {
             refreshSurfaces();
             t = PerfProbe.lap(PerfProbe.SCAN, t);
         }
+        if (world.hasFollowers()) updatePointer();
         world.tick(dt);
         t = PerfProbe.lap(PerfProbe.SIM, t);
         repaintDirty();
@@ -410,7 +429,36 @@ final class PetOverlay extends JComponent {
         setFont(JBFont.small()); // re-derive after LaF / IDE zoom changes
     }
 
+    /** Tells pets that follow the pointer where it is, in overlay coordinates. */
+    private void updatePointer() {
+        java.awt.PointerInfo info = java.awt.MouseInfo.getPointerInfo();
+        if (info == null) {
+            world.clearPointer();
+            return;
+        }
+        java.awt.Point pt = info.getLocation();
+        SwingUtilities.convertPointFromScreen(pt, this);
+        if (pt.x < 0 || pt.y < 0 || pt.x >= getWidth() || pt.y >= getHeight()) world.clearPointer();
+        else world.setPointer(pt.x, pt.y);
+    }
+
+    /** Opens the pet's menu on the platform's popup trigger (press on macOS/Linux, release on Windows). */
+    private void showMenu(MouseEvent e) {
+        Pet p = menuPet != null ? menuPet : world.petAt(e.getX(), e.getY());
+        menuPet = null;
+        if (p == null || dragging || !world.pets().contains(p)) return;
+        e.consume();
+        PetMenu.show(this, p, e.getPoint());
+    }
+
     private void onPress(MouseEvent e) {
+        if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
+            // right-click opens the menu and never picks up or pets the pet
+            if (pressedPet == null) menuPet = world.petAt(e.getX(), e.getY());
+            if (e.isPopupTrigger()) showMenu(e);
+            e.consume();
+            return;
+        }
         if (!SwingUtilities.isLeftMouseButton(e)) return;
         pressedPet = world.petAt(e.getX(), e.getY());
         if (pressedPet == null) return;
@@ -440,7 +488,12 @@ final class PetOverlay extends JComponent {
     }
 
     private void onRelease(MouseEvent e) {
-        if (pressedPet == null) return;
+        if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
+            if (e.isPopupTrigger() && pressedPet == null) showMenu(e);
+            e.consume();
+            return;
+        }
+        if (pressedPet == null || !SwingUtilities.isLeftMouseButton(e)) return;
         if (dragging) {
             world.release(pressedPet, throwVx, throwVy);
         } else {

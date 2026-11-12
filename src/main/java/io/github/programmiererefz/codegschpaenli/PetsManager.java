@@ -41,6 +41,12 @@ public final class PetsManager implements Disposable {
         overlays.throwBall(frame);
     }
 
+    /** Pets that were told to leave for now come back. */
+    public void callBackPets() {
+        ensureStarted();
+        if (overlays != null) overlays.callBack();
+    }
+
     @Override
     public void dispose() {
         if (overlays != null) {

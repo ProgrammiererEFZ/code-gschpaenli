@@ -17,8 +17,9 @@ public final class Pet {
 
     public final String id;
     public final PetKind kind;
-    public final PetKind.Palette palette;
-    public final String name;
+    /** Not final: an adopted pet's colour and name can be changed while it keeps walking around. */
+    public PetKind.Palette palette;
+    public String name;
 
     public double x;
     public double y;
@@ -66,6 +67,11 @@ public final class Pet {
     boolean fadingOut;
     double leaveTime;
 
+    /** Told to stay: the pet sits (and may doze off) where it is until released. It still falls if its floor goes. */
+    public boolean staying;
+    /** Seconds left following the mouse pointer; 0 when not following. */
+    double followTime;
+
     public Pet(String id, PetKind kind, PetKind.Palette palette, String name) {
         this.id = id;
         this.kind = kind;
@@ -100,5 +106,9 @@ public final class Pet {
 
     public boolean isHappy() {
         return happyTimer > 0;
+    }
+
+    public boolean isFollowing() {
+        return followTime > 0;
     }
 }

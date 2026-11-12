@@ -29,6 +29,15 @@ Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm,
 - **Interaction**
   - Click a pet to pet it (hearts).
   - Drag a pet to pick it up, then throw it.
+  - Right-click a pet for its menu:
+    - *Pet*, *Play Ball* (a ball just for this pet), *Follow Me* (it runs after the mouse pointer for 20 seconds),
+      *Take a Nap* / *Wake Up*
+    - *Stay*: it sits down and stays put, dozing now and then, until you choose *Free to Roam*. It ignores balls,
+      and if you pick it up it stays wherever you drop it.
+    - *Rename...* and *Color* (a visitor's colour only changes for its current visit)
+    - *Adopt* a visitor: it stays with you as one of your own pets.
+    - *Leave*: a visitor walks off for good. An adopted pet (*Leave for Now*) walks off in every window and comes back
+      at the next IDE start or with **Tools | Code Gschpänli | Roll Call**; it is not removed.
   - **Tools | Code Gschpänli | Throw Ball** sends every pet chasing a ball.
 - **Random visitors:** on by default, a changing crowd of one to three pets drops by, stays one to eight minutes, and walks off again.
   You set the range, for example "between 1 and 3 at a time". Use the same number twice for a fixed count.
@@ -39,8 +48,8 @@ Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm,
   - which IDE parts pets may walk on
   - visitors (range, which art styles)
   - your adopted pets
-- **Tools | Code Gschpänli** menu: Adopt a Pet, Throw Ball, Roll Call, Show Pets, Show Name Tags, Random Visitors,
-  Remove Pet, Remove All Pets
+- **Tools | Code Gschpänli** menu: Adopt a Pet, Throw Ball, Roll Call (also calls back pets that left for now),
+  Show Pets, Show Name Tags, Random Visitors, Remove Pet, Remove All Pets
 
 | Cartoon pets | Pixel-art pets |
 | --- | --- |

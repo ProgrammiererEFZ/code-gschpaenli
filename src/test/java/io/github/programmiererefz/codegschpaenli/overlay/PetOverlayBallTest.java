@@ -33,7 +33,7 @@ class PetOverlayBallTest {
         JRootPane rootPane = new JRootPane();
         rootPane.setSize(W, H);
         rootPane.getLayeredPane().setBounds(0, 0, W, H);
-        PetOverlay o = new PetOverlay(rootPane, 7);
+        PetOverlay o = new PetOverlay(rootPane, 7, new PetOverlays(() -> { }));
         o.regionPainter = this::paintRegion;
         o.applySettings(new PetsSettings.StateBean(), PetsSettings.Size.SMALL);
         o.world().setSurfaces(List.of()); // just the window bottom
