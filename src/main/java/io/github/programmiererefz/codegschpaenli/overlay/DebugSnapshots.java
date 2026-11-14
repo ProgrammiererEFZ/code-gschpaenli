@@ -94,7 +94,8 @@ final class DebugSnapshots {
                         for (var other : fem.getOpenFiles()) {
                             if (!other.equals(file)) fem.closeFile(other);
                         }
-                        fem.openFile(file, true);
+                        // not FileEditorManager.openFile: all its blocking variants are deprecated since 2026.3
+                        new com.intellij.openapi.fileEditor.OpenFileDescriptor(p, file).navigate(true);
                     }
                 }
                 var twm = com.intellij.openapi.wm.ToolWindowManager.getInstance(p);

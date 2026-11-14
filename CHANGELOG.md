@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- No longer uses `FileEditorManager.openFile`, which IntelliJ IDEA 2026.3 deprecates (reported by the JetBrains
+  Marketplace verifier). It was only called by the developer benchmark and screenshot tools.
+
 ## [0.1.2] - 2026-11-14
 
 ### Added

@@ -7,7 +7,7 @@ package io.github.programmiererefz.codegschpaenli.overlay;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
@@ -374,7 +374,8 @@ final class PerfProbe {
             if (dir == null) continue;
             for (VirtualFile f : dir.getChildren()) {
                 if (!f.isDirectory()) {
-                    FileEditorManager.getInstance(p).openFile(f, true);
+                    // not FileEditorManager.openFile: all its blocking variants are deprecated since 2026.3
+                    new OpenFileDescriptor(p, f).navigate(true);
                     break;
                 }
             }
