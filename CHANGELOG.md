@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-14
+
 ### Added
 
 - Pets that live on the IDE window itself: they walk along the window header and status bar, nap on tool windows,
@@ -29,3 +31,6 @@
 - Cartoon pets' near legs are drawn in front of the light belly and coat markings instead of disappearing behind them.
 - Throwing a ball while the previous one was still around could show both balls at once when the animation was
   paused, e.g. because the Find Action popup had focus.
+
+[Unreleased]: https://github.com/ProgrammiererEFZ/code-gschpaenli/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/ProgrammiererEFZ/code-gschpaenli/commits/v0.1.2
