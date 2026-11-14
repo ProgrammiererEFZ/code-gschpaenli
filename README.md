@@ -53,7 +53,7 @@ Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm,
 
 | Cartoon pets | Pixel-art pets |
 | --- | --- |
-| ![Cartoon pets in all poses](docs/cartoon-pets.png) | ![Pixel-art pets in all poses](docs/pixel-pets.png) |
+| ![All 11 cartoon pets](docs/cartoon-pets.png) | ![All 22 pixel-art pets](docs/pixel-pets.png) |
 
 To hide all pets, untick **Tools | Code Gschpänli | Show Pets**. Pets also pause while *File | Power Save Mode* is on. The plugin collects no data and makes no network requests.
 
