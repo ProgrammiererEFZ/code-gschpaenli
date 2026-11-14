@@ -1,6 +1,7 @@
 <idea-plugin>
     <id>io.github.programmiererefz.codegschpaenli</id>
-    <name>Code Gschpänli</name>
+    <!-- Marketplace plugin names allow only ASCII letters, so the umlaut is written out here; menus and docs keep "Gschpänli". -->
+    <name>Code Gschpaenli</name>
     <vendor url="https://github.com/ProgrammiererEFZ">ProgrammiererEFZ</vendor>
     <description><![CDATA[
     Little pets that live <b>on your IDE itself</b>: they walk along the status bar and the window header, nap on top of
