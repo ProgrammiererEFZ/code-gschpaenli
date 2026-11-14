@@ -38,11 +38,28 @@ final class DebugSnapshots {
 
     private int shots;
 
-    /** Adds a handful of pets so all species can be inspected. */
+    /**
+     * Adds a handful of pets so all species can be inspected. With {@code -Dcodegschpaenli.debug.kinds=KOALA,PIXEL_OWL,...}
+     * the adopted pets are replaced by exactly those species (first colour variant), random visitors and
+     * name tags are switched off, and after a few seconds the pets are spread evenly over the walkable surfaces, for a
+     * controlled scene (e.g. screenshots). {@code -Dcodegschpaenli.debug.windowSize=1280x800} also resizes each project
+     * window so that its content has exactly that size.
+     */
     static void seedPets() {
         if (!ENABLED) return;
-        int wanted = Integer.getInteger("codegschpaenli.debug.pets", 0);
         PetsSettings s = PetsSettings.getInstance();
+        String kindList = System.getProperty("codegschpaenli.debug.kinds", "").trim();
+        if (!kindList.isEmpty()) {
+            s.getState().pets.clear();
+            for (String name : kindList.split(",")) {
+                PetKind k = PetKind.parse(name.trim());
+                s.getState().pets.add(new PetsSettings.PetEntry(k, k.palettes().get(0).name(), PetNames.random(k)));
+            }
+            s.getState().showNames = false;
+            s.getState().visitorsEnabled = false;
+            return;
+        }
+        int wanted = Integer.getInteger("codegschpaenli.debug.pets", 0);
         PetKind[] kinds = PetKind.values();
         for (int i = s.getState().pets.size(); i < wanted; i++) {
             PetKind k = kinds[i % kinds.length];
@@ -61,21 +78,81 @@ final class DebugSnapshots {
     void onFrame(int frameCounter, Collection<PetOverlay> overlays) {
         if (!ENABLED || frameCounter % EVERY_FRAMES != 0 || shots >= MAX_SHOTS) return;
         shots++;
+        if (shots == 1) resizeWindows(overlays);
         if (shots == 2) {
             // open a bottom tool window so there is a surface in the middle of the window
+            // (-Dcodegschpaenli.debug.toolWindow=Terminal picks another one), and optionally a file in the editor
+            // (-Dcodegschpaenli.debug.openFile=src/Main.java, relative to the project; all other editors are closed)
+            String toolWindow = System.getProperty("codegschpaenli.debug.toolWindow", "Problems View");
+            String openFile = System.getProperty("codegschpaenli.debug.openFile", "").trim();
             for (com.intellij.openapi.project.Project p : com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()) {
+                if (!openFile.isEmpty() && p.getBasePath() != null) {
+                    var file = com.intellij.openapi.vfs.LocalFileSystem.getInstance()
+                            .refreshAndFindFileByPath(p.getBasePath() + "/" + openFile);
+                    if (file != null) {
+                        var fem = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(p);
+                        for (var other : fem.getOpenFiles()) {
+                            if (!other.equals(file)) fem.closeFile(other);
+                        }
+                        fem.openFile(file, true);
+                    }
+                }
                 var twm = com.intellij.openapi.wm.ToolWindowManager.getInstance(p);
-                var tw = twm.getToolWindow("Problems View");
+                var tw = twm.getToolWindow(toolWindow);
                 if (tw != null) tw.show();
                 // the Project view shows the project's full path; hide it so snapshots can be used as screenshots
                 var project = twm.getToolWindow("Project");
                 if (project != null) project.hide();
             }
         }
+        boolean scene = !System.getProperty("codegschpaenli.debug.kinds", "").isBlank();
+        if (scene && shots == 4) { // after the tool window and editor have settled
+            for (PetOverlay o : overlays) spreadPets(o.world());
+        }
         int i = 0;
         for (PetOverlay o : overlays) {
-            if (shots == BALL_AT_SHOT) o.throwBall();
+            if (shots == BALL_AT_SHOT && !scene) o.throwBall();
             write(o, i++);
+        }
+    }
+
+    /** Drops the pets evenly over the walkable surfaces (round robin, evenly spaced along each surface). */
+    private static void spreadPets(io.github.programmiererefz.codegschpaenli.world.World world) {
+        java.util.List<Surface> surfaces = new java.util.ArrayList<>();
+        for (Surface s : world.surfaces()) {
+            if (!"window bottom".equals(s.label())) surfaces.add(s);
+        }
+        if (surfaces.isEmpty()) return;
+        java.util.List<Pet> pets = new java.util.ArrayList<>(world.pets());
+        int n = surfaces.size();
+        for (int si = 0; si < n; si++) {
+            Surface s = surfaces.get(si);
+            java.util.List<Pet> here = new java.util.ArrayList<>();
+            for (int pi = si; pi < pets.size(); pi += n) here.add(pets.get(pi));
+            for (int k = 0; k < here.size(); k++) {
+                Pet p = here.get(k);
+                double x = s.x1() + s.width() * (k + 0.5 + (si % 2) * 0.25) / (here.size() + 0.25);
+                world.grab(p);
+                world.drag(p, x, s.y() - 2);
+                world.release(p, 0, 0);
+            }
+        }
+    }
+
+    /** Resizes each project window so that its content (the root pane) matches {@code codegschpaenli.debug.windowSize}. */
+    private static void resizeWindows(Collection<PetOverlay> overlays) {
+        String size = System.getProperty("codegschpaenli.debug.windowSize", "").trim();
+        String[] wh = size.split("x");
+        if (wh.length != 2) return;
+        int w = Integer.parseInt(wh[0].trim());
+        int h = Integer.parseInt(wh[1].trim());
+        for (PetOverlay o : overlays) {
+            java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(o.rootPane());
+            if (win == null) continue;
+            if (win instanceof java.awt.Frame f) f.setExtendedState(java.awt.Frame.NORMAL);
+            JRootPane rp = o.rootPane();
+            win.setSize(win.getWidth() + w - rp.getWidth(), win.getHeight() + h - rp.getHeight());
+            win.validate();
         }
     }
 

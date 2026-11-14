@@ -13,7 +13,7 @@ balls you throw.
 
 Works in IntelliJ-based IDEs 2025.2 and newer (IntelliJ IDEA, PhpStorm, PyCharm, ...).
 
-![Pets on the window header and on top of a tool window](docs/in-the-ide.png)
+![Pixel-art pets on the title bar, the terminal and the status bar of IntelliJ IDEA; the cockatoo climbs the window border](docs/in-the-ide.png)
 
 "Gschpänli" is Swiss German for "little buddies": the companions that keep you company while you code.
 

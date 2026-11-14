@@ -104,8 +104,10 @@ changelog {
 }
 
 // Extra sandbox targets to try the plugin in other locally installed IDEs. Registered only when the IDE exists,
-// so CI and other machines are unaffected. Override the paths with -PphpStormPath=... / -PpyCharmPath=...
+// so CI and other machines are unaffected. Override the paths with -PideaPath=... / -PphpStormPath=... / -PpyCharmPath=...
 val localRunTargets = mapOf(
+    // The newest locally installed IntelliJ IDEA (the plugin is still compiled against platformVersion).
+    "runIdea" to providers.gradleProperty("ideaPath").orElse("C:/Program Files/JetBrains/IntelliJ IDEA 2026.3"),
     "runPhpStorm" to providers.gradleProperty("phpStormPath").orElse("C:/Program Files/JetBrains/PhpStorm 2026.2.3"),
     // Must be PyCharm 2025.2 or newer (sinceBuild 252); 2025.1 would not load the plugin.
     "runPyCharm" to providers.gradleProperty("pyCharmPath").orElse("C:/Program Files/JetBrains/PyCharm 2025.2"),
@@ -126,15 +128,27 @@ intellijPlatformTesting {
 // Development helpers for the sandbox IDE:
 //   ./gradlew runIde -PopenProject=<dir>          opens a project directly
 //   ./gradlew runIde -PpetsDebugDir=<dir>         writes periodic window snapshots (PNG) + surface dumps there
+//                    -PpetsDebugKinds=KOALA,PIXEL_OWL,...  with petsDebugDir: seed exactly these species, no visitors/name tags
+//                    -PpetsDebugWindowSize=1280x800        with petsDebugDir: resize the window content to that size
+//                    -PpetsDebugToolWindow=Terminal        with petsDebugDir: tool window to open (default Problems View)
+//                    -PpetsDebugOpenFile=src/Main.java     with petsDebugDir: file to show in the editor
 //   ./gradlew runIde -PpetsPerfLog=<file>         runs an ~11 minute benchmark (pets off / 1 / 6 pets at 30 and 60 fps),
 //                                                 appends the results to <file> and closes the IDE (overlay/PerfProbe)
 val openProject = providers.gradleProperty("openProject")
 val petsDebugDir = providers.gradleProperty("petsDebugDir")
+val petsDebugKinds = providers.gradleProperty("petsDebugKinds")
+val petsDebugWindowSize = providers.gradleProperty("petsDebugWindowSize")
+val petsDebugToolWindow = providers.gradleProperty("petsDebugToolWindow")
+val petsDebugOpenFile = providers.gradleProperty("petsDebugOpenFile")
 val petsPerfLog = providers.gradleProperty("petsPerfLog")
 tasks.withType<RunIdeTask>().configureEach {
     // The lambdas below must capture only these local providers, not the script-level vals: reading a script-level val
     // captures the Gradle script object, which the configuration cache cannot serialize ("BUILD FAILED" after every run).
     val debugDir = petsDebugDir
+    val debugKinds = petsDebugKinds
+    val debugWindowSize = petsDebugWindowSize
+    val debugToolWindow = petsDebugToolWindow
+    val debugOpenFile = petsDebugOpenFile
     val perfLog = petsPerfLog
     val projectToOpen = openProject
     jvmArgumentProviders += CommandLineArgumentProvider {
@@ -143,6 +157,10 @@ tasks.withType<RunIdeTask>().configureEach {
             if (debugDir.isPresent) {
                 add("-Dcodegschpaenli.debug.snapshotDir=${debugDir.get()}")
                 add("-Dcodegschpaenli.debug.pets=6")
+                if (debugKinds.isPresent) add("-Dcodegschpaenli.debug.kinds=${debugKinds.get()}")
+                if (debugWindowSize.isPresent) add("-Dcodegschpaenli.debug.windowSize=${debugWindowSize.get()}")
+                if (debugToolWindow.isPresent) add("-Dcodegschpaenli.debug.toolWindow=${debugToolWindow.get()}")
+                if (debugOpenFile.isPresent) add("-Dcodegschpaenli.debug.openFile=${debugOpenFile.get()}")
                 add("-Didea.trust.all.projects=true")
             }
             if (perfLog.isPresent) {
